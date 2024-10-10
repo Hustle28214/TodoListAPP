@@ -173,3 +173,34 @@ class Project:
             interest=interest,
             progress_history=progress_history
         )
+class DailyProgress:
+    def __init__(self, progress_date, tasks_completed=0, notes='', tags=None):
+        """
+        :param progress_date: 日期，字符串格式 YYYY-MM-DD
+        :param tasks_completed: 完成的任务数，整数
+        :param notes: 备注，字符串
+        :param tags: 标签，列表，包含 AbilityTag 对象
+        """
+        self.progress_date = progress_date
+        self.tasks_completed = tasks_completed
+        self.notes = notes
+        self.tags = tags if tags else []
+
+    def to_dict(self):
+        return {
+            'progress_date': self.progress_date,
+            'tasks_completed': self.tasks_completed,
+            'notes': self.notes,
+            'tags': [tag.to_dict() for tag in self.tags]
+        }
+
+    @staticmethod
+    def from_dict(data):
+        tags_data = data.get('tags', [])
+        tags = [AbilityTag.from_dict(tag_data) for tag_data in tags_data]
+        return DailyProgress(
+            progress_date=data['progress_date'],
+            tasks_completed=data.get('tasks_completed', 0),
+            notes=data.get('notes', ''),
+            tags=tags
+        )

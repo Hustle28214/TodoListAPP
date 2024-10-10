@@ -1,4 +1,5 @@
 # main.py
+
 import tkinter as tk
 from tkinter import ttk
 from data_manager import DataManager
@@ -7,6 +8,7 @@ from views.diary_view import DiaryView
 from views.summary_view import SummaryView
 from views.abilities_view import AbilitiesView
 from views.projects_view import ProjectsView
+from views.daily_progress_view import DailyProgressView  # 导入 DailyProgressView
 from models import AbilityTag
 
 def main():
@@ -20,7 +22,6 @@ def main():
         root.iconbitmap('todo.ico')
     except Exception as e:
         print(f"无法加载图标文件: {e}")
-
 
     # 初始化数据管理器
     data_manager = DataManager()
@@ -37,11 +38,10 @@ def main():
     notebook.add(tasks_frame, text='运筹')
     TasksView(tasks_frame, data_manager, abilities)
 
-    # 创建“日拱一卒”标签页
+    # 创建“拱卒”标签页
     daily_progress_frame = ttk.Frame(notebook)
     notebook.add(daily_progress_frame, text='拱卒')
-    # 假设 DailyProgressView 已经实现
-    # DailyProgressView(daily_progress_frame, data_manager)
+    DailyProgressView(daily_progress_frame, data_manager, abilities)  # 添加 DailyProgressView
 
     # 创建“日记”标签页
     diary_frame = ttk.Frame(notebook)

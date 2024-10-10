@@ -1,4 +1,5 @@
 # views/tasks_view.py
+
 import tkinter as tk
 from tkinter import messagebox, ttk, simpledialog
 from tkcalendar import Calendar
@@ -140,11 +141,11 @@ class TasksView:
             name = name_entry.get().strip()
             due_date = cal.get_date()
             interest = interest_var.get()
-            
+
             # 获取选择的多个能力标签
             selected_indices = abilities_listbox.curselection()
             selected_abilities = [self.abilities[i] for i in selected_indices]
-            
+
             is_project = is_project_var.get()
             description = description_text.get("1.0", tk.END).strip()
 
@@ -160,6 +161,10 @@ class TasksView:
                 new_task = Task(name, due_date, interest, description, abilities=selected_abilities, progress=0)
                 self.tasks.append(new_task)
                 self.data_manager.save_tasks(self.tasks)
+
+            # 同步每日进度
+            self.data_manager.synchronize_daily_progress()
+
             self.refresh_treeview()
             add_window.destroy()
 
@@ -225,7 +230,7 @@ class TasksView:
             tk.Label(edit_window, text="能力标签:").grid(row=3, column=0, padx=10, pady=5, sticky=tk.W)
 
             # 使用 Listbox 允许多选
-            abilities_var = tk.Variable(value=[ability.name for ability in self.abilities])
+            abilities_var = tk.Variable(value=[tag.name for tag in self.abilities])
             abilities_listbox = tk.Listbox(edit_window, listvariable=abilities_var, selectmode='multiple', height=5)
             abilities_listbox.grid(row=3, column=1, padx=10, pady=5, sticky=tk.W)
 
@@ -253,11 +258,11 @@ class TasksView:
                 name = name_entry.get().strip()
                 due_date = cal.get_date()
                 interest = interest_var.get()
-                
+
                 # 获取选择的多个能力标签
                 selected_indices = abilities_listbox.curselection()
                 selected_abilities = [self.abilities[i] for i in selected_indices]
-                
+
                 description = description_text.get("1.0", tk.END).strip()
 
                 if not name:
@@ -272,6 +277,10 @@ class TasksView:
 
                 self.data_manager.save_tasks(self.tasks)
                 self.data_manager.save_projects(self.projects)
+
+                # 同步每日进度
+                self.data_manager.synchronize_daily_progress()
+
                 self.refresh_treeview()
                 edit_window.destroy()
 
@@ -303,6 +312,10 @@ class TasksView:
                     self.data_manager.save_projects(self.projects)
                 else:
                     self.data_manager.save_tasks(self.tasks)
+
+                # 同步每日进度
+                self.data_manager.synchronize_daily_progress()
+
                 self.refresh_treeview()
         else:
             messagebox.showwarning("警告", "请选择要删除的任务！")
@@ -398,6 +411,10 @@ class TasksView:
 
                 self.data_manager.save_tasks(self.tasks)
                 self.data_manager.save_projects(self.projects)
+
+                # 同步每日进度
+                self.data_manager.synchronize_daily_progress()
+
                 self.refresh_treeview()
                 progress_window.destroy()
 

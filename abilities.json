@@ -17,7 +17,7 @@
     },
     {
         "name": "APP",
-        "parent": null
+        "parent": "前端"
     },
     {
         "name": "机器学习",

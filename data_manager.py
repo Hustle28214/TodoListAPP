@@ -1,7 +1,8 @@
 # data_manager.py
 import json
 import os
-from models import Task, DiaryEntry, PeriodicSummary, Project, AbilityTag
+from models import Task, DiaryEntry, PeriodicSummary, Project, AbilityTag, DailyProgress
+from collections import defaultdict  # 导入 defaultdict
 import tempfile
 import shutil
 
@@ -13,6 +14,7 @@ class DataManager:
         self.summaries_file = "summaries.json"
         self.projects_file = "projects.json"
         self.abilities_file = "abilities.json"
+        self.daily_progress_file = "daily_progress.json"
 
     # ----------------- 任务数据管理 ----------------- #
     def load_tasks(self):
@@ -37,6 +39,28 @@ class DataManager:
         except Exception as e:
             print(f"保存任务时出错: {e}")
 
+    # ----------------- 每日进度（拱卒）数据管理 ----------------- #
+    def load_daily_progress(self):
+        if os.path.exists(self.daily_progress_file):
+            try:
+                with open(self.daily_progress_file, 'r', encoding='utf-8') as f:
+                    data = json.load(f)
+                    return [DailyProgress.from_dict(entry) for entry in data]
+            except json.JSONDecodeError as e:
+                print(f"加载每日进度时出错: {e}")
+                return []
+            except Exception as e:
+                print(f"加载每日进度时出错: {e}")
+                return []
+        return []
+
+    def save_daily_progress(self, daily_progress_list):
+        try:
+            data = [entry.to_dict() for entry in daily_progress_list]
+            with open(self.daily_progress_file, 'w', encoding='utf-8') as f:
+                json.dump(data, f, ensure_ascii=False, indent=4)
+        except Exception as e:
+            print(f"保存每日进度时出错: {e}")
 
     # ----------------- 日记数据管理 ----------------- #
     def load_diary_entries(self):
@@ -146,6 +170,39 @@ class DataManager:
         except Exception as e:
             print(f"保存能力标签时出错: {e}")
 
+   # ----------------- 自动同步每日进度 ----------------- #
+    def synchronize_daily_progress(self):
+        """
+        根据任务的进度历史自动同步每日进度。
+        """
+        tasks = self.load_tasks()
+        daily_progress_list = self.load_daily_progress()
+
+        # 使用 defaultdict 聚合每一天的任务完成数
+        progress_counter = defaultdict(int)
+
+        for task in tasks:
+            for entry in task.progress_history:
+                timestamp, description, progress = entry
+                date_str = timestamp.split(' ')[0]  # 提取日期部分
+                progress_counter[date_str] += 1  # 假设每次进度更新计为一个完成任务
+
+        # 将聚合结果与现有的每日进度列表对比，并更新或添加条目
+        existing_dates = {dp.progress_date for dp in daily_progress_list}
+
+        for date_str, count in progress_counter.items():
+            if date_str in existing_dates:
+                # 更新已存在的条目
+                dp = next(dp for dp in daily_progress_list if dp.progress_date == date_str)
+                dp.tasks_completed = count
+            else:
+                # 添加新的条目
+                new_dp = DailyProgress(progress_date=date_str, tasks_completed=count)
+                daily_progress_list.append(new_dp)
+
+        # 保存更新后的每日进度列表
+        self.save_daily_progress(daily_progress_list)
+
     # ----------------- 综合数据管理 ----------------- #
     def load_all_data(self):
         """
@@ -156,15 +213,22 @@ class DataManager:
         summaries = self.load_summaries()
         projects = self.load_projects()
         abilities = self.load_abilities()
+        daily_progress = self.load_daily_progress()  # 加载每日进度
+
+        # 同步每日进度
+        self.synchronize_daily_progress()
+        daily_progress = self.load_daily_progress()  # 重新加载以获取最新的同步结果
+
         return {
             'tasks': tasks,
             'diary_entries': diary_entries,
             'summaries': summaries,
             'projects': projects,
-            'abilities': abilities
+            'abilities': abilities,
+            'daily_progress': daily_progress  # 包含每日进度
         }
 
-    def save_all_data(self, tasks, diary_entries, summaries, projects, abilities):
+    def save_all_data(self, tasks, diary_entries, summaries, projects, abilities, daily_progress):
         """
         保存所有类型的数据。
         """
@@ -173,3 +237,4 @@ class DataManager:
         self.save_summaries(summaries)
         self.save_projects(projects)
         self.save_abilities(abilities)
+        self.save_daily_progress(daily_progress)  # 保存每日进度
