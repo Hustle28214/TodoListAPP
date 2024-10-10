@@ -1,0 +1,22 @@
+[
+    {
+        "name": "英蓝杯",
+        "due_date": "2024-10-14",
+        "interest": 3,
+        "description": "初步调研完成，脑海中有一个基本的模型，有磁环有内腔。需要建模。",
+        "abilities": [
+            {
+                "name": "SolidWorks",
+                "parent": null
+            }
+        ],
+        "progress": 10,
+        "progress_history": [
+            [
+                "2024-10-11 00:12:24",
+                "初步调研完成。",
+                10
+            ]
+        ]
+    }
+]

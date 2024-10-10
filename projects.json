@@ -1,0 +1,88 @@
+[
+    {
+        "name": "工创赛：温差电动车",
+        "due_date": "2024-12-10",
+        "abilities": [
+            {
+                "name": "SolidWorks",
+                "parent": null
+            }
+        ],
+        "description": "任务已经划分，主要负责小车的驱动部分，即温差驱动设计。",
+        "progress": 10,
+        "progress_history": [
+            [
+                "2024-10-11 00:26:07",
+                "2024.10.15 市赛规则培训",
+                10
+            ]
+        ],
+        "interest": 3
+    },
+    {
+        "name": "iGEM APP",
+        "due_date": "2024-10-20",
+        "abilities": [
+            {
+                "name": "前端",
+                "parent": null
+            },
+            {
+                "name": "APP",
+                "parent": null
+            }
+        ],
+        "description": "iGEM的最后一舞，仿照基因检测报告的APP。",
+        "progress": 78,
+        "progress_history": [
+            [
+                "2024-10-11 00:29:23",
+                "剩余Navigator和Android/iOS打包操作",
+                78
+            ]
+        ],
+        "interest": 2
+    },
+    {
+        "name": "软著：感知增量学习系统",
+        "due_date": "2024-11-01",
+        "abilities": [
+            {
+                "name": "机器学习",
+                "parent": null
+            }
+        ],
+        "description": "文书写作，理解-深入细节-写作-深入细节-优化文本",
+        "progress": 0,
+        "progress_history": [],
+        "interest": 3
+    },
+    {
+        "name": "软著：项目管理系统",
+        "due_date": "2024-10-11",
+        "abilities": [
+            {
+                "name": "无",
+                "parent": null
+            }
+        ],
+        "description": "本项目的软著写作，需要撰写项目文档，可能转手做。",
+        "progress": 0,
+        "progress_history": [],
+        "interest": 2
+    },
+    {
+        "name": "四足机器人ROS控制",
+        "due_date": "2024-11-20",
+        "abilities": [
+            {
+                "name": "ROS",
+                "parent": null
+            }
+        ],
+        "description": "需要学完赵虚左老师的ROS教程。",
+        "progress": 0,
+        "progress_history": [],
+        "interest": 3
+    }
+]
