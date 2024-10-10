@@ -32,29 +32,23 @@ class Task:
             'due_date': self.due_date,
             'interest': self.interest,
             'description': self.description,
-            'abilities': [ability.to_dict() for ability in self.abilities],
+            'abilities': [ability.to_dict() for ability in self.abilities],  # 确保这是一个列表
             'progress': self.progress,
             'progress_history': self.progress_history
         }
 
     @staticmethod
     def from_dict(data):
+        abilities_data = data.get('abilities', [])
         abilities = []
 
-        # 新格式，abilities 是列表
-        if 'abilities' in data:
-            abilities_data = data['abilities']
-            if isinstance(abilities_data, list):
-                abilities = [AbilityTag.from_dict(ability_data) for ability_data in abilities_data]
-            elif isinstance(abilities_data, dict):
-                abilities.append(AbilityTag.from_dict(abilities_data))
-            else:
-                abilities = []
-        # 旧格式，ability 是单个对象
-        elif 'ability' in data:
-            ability_data = data['ability']
-            if ability_data:
-                abilities.append(AbilityTag.from_dict(ability_data))
+        # 处理旧格式，abilities_data 是单个对象的情况
+        if isinstance(abilities_data, dict):
+            abilities.append(AbilityTag.from_dict(abilities_data))
+        # 处理新格式，abilities_data 是列表的情况
+        elif isinstance(abilities_data, list):
+            abilities = [AbilityTag.from_dict(ability_data) for ability_data in abilities_data]
+        # abilities_data 为空或为 None 的情况
         else:
             abilities = []
 
@@ -63,7 +57,7 @@ class Task:
             due_date=data['due_date'],
             interest=data.get('interest', None),
             description=data.get('description', ''),
-            abilities=abilities,
+            abilities=abilities,  # 这里确保 abilities 是一个列表
             progress=data.get('progress', 0)
         )
         task.progress_history = data.get('progress_history', [])
