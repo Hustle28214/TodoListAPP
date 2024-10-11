@@ -108,20 +108,5 @@
                 31
             ]
         ]
-    },
-    {
-        "name": "鱼皮OJ",
-        "due_date": "2024-12-31",
-        "interest": 3,
-        "description": "前后端毕业项目",
-        "abilities": [
-            {
-                "name": "无",
-                "parent": null,
-                "knowledge_points": []
-            }
-        ],
-        "progress": 0,
-        "progress_history": []
     }
 ]

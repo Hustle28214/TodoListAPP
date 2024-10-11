@@ -110,8 +110,9 @@ class ProjectsView:
         abilities_listbox = tk.Listbox(add_window, listvariable=abilities_var, selectmode='multiple', height=5)
         abilities_listbox.grid(row=4, column=1, padx=10, pady=5, sticky=tk.W)
 
-        add_ability_button = tk.Button(add_window, text="添加能力标签", command=lambda: self.add_ability_tag(add_window))
+        add_ability_button = tk.Button(add_window, text="添加能力标签", command=lambda: self.add_ability_tag(add_window, abilities_listbox))
         add_ability_button.grid(row=4, column=2, padx=5, pady=5)
+
 
         # 实现搜索功能
         def search_abilities(event):
@@ -174,12 +175,7 @@ class ProjectsView:
         add_button = tk.Button(add_window, text="添加", command=add_project)
         add_button.grid(row=8, column=0, columnspan=3, pady=10)
 
-    def add_ability_tag(self, parent_window):
-        """
-        添加新的能力标签。
-
-        :param parent_window: 父窗口
-        """
+    def add_ability_tag(self, parent_window, abilities_listbox):
         new_tag = simpledialog.askstring("添加能力标签", "请输入新的能力标签:", parent=parent_window)
         if new_tag:
             if any(ability.name == new_tag for ability in self.abilities):
@@ -189,13 +185,9 @@ class ProjectsView:
                 self.abilities.append(new_ability)
                 self.data_manager.save_abilities(self.abilities)
                 display_info("成功", "能力标签已添加。")
-                # 更新列表框中的能力标签
-                children = parent_window.winfo_children()
-                for widget in children:
-                    if isinstance(widget, tk.Listbox):
-                        abilities_var = tk.Variable(value=[ability.name for ability in self.abilities])
-                        widget.config(listvariable=abilities_var)
-                        break
+                # 更新 Listbox 中的能力标签
+                abilities_listbox.insert(tk.END, new_tag)
+
 
     def edit_project(self):
         """
@@ -242,8 +234,9 @@ class ProjectsView:
                 if ability.name in current_ability_names:
                     abilities_listbox.select_set(idx)
 
-            add_ability_button = tk.Button(edit_window, text="添加能力标签", command=lambda: self.add_ability_tag(edit_window))
+            add_ability_button = tk.Button(edit_window, text="添加能力标签", command=lambda: self.add_ability_tag(edit_window, abilities_listbox))
             add_ability_button.grid(row=4, column=2, padx=5, pady=5)
+
 
             # 实现搜索功能
             def search_abilities(event):

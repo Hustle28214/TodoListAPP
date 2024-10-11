@@ -171,9 +171,11 @@ class TasksView:
         abilities_listbox = tk.Listbox(add_window, listvariable=abilities_var, selectmode='multiple', height=5)
         abilities_listbox.grid(row=4, column=1, padx=10, pady=5, sticky=tk.W)
 
+        
         # 添加能力标签按钮
-        add_ability_button = tk.Button(add_window, text="添加能力标签", command=lambda: self.add_ability_tag(add_window))
+        add_ability_button = tk.Button(add_window, text="添加能力标签", command=lambda: self.add_ability_tag(add_window, abilities_listbox))
         add_ability_button.grid(row=4, column=2, padx=5, pady=5)
+
 
         # 实现搜索功能
         def search_abilities(event):
@@ -215,7 +217,7 @@ class TasksView:
         add_button = tk.Button(add_window, text="添加", command=add_task)
         add_button.grid(row=6, column=0, columnspan=3, pady=10)
 
-    def add_ability_tag(self, parent_window, abilities_listbox=None):
+    def add_ability_tag(self, parent_window, abilities_listbox):
         new_tag = simpledialog.askstring("添加能力标签", "请输入新的能力标签:", parent=parent_window)
         if new_tag:
             if any(ability.name == new_tag for ability in self.abilities):
@@ -226,17 +228,7 @@ class TasksView:
                 self.data_manager.save_abilities(self.abilities)
                 display_info("成功", "能力标签已添加。")
                 # 更新 Listbox 中的能力标签
-                if abilities_listbox:
-                    abilities_listbox.insert(tk.END, new_tag)
-                else:
-                    # If no specific listbox is provided, update all listboxes in the parent window
-                    children = parent_window.winfo_children()
-                    for widget in children:
-                        if isinstance(widget, tk.Listbox):
-                            abilities_var = tk.Variable(value=[ability.name for ability in self.abilities])
-                            widget.config(listvariable=abilities_var)
-                            break
-
+                abilities_listbox.insert(tk.END, new_tag)
     def edit_task(self):
         selected_item = self.tree.selection()
         if selected_item:

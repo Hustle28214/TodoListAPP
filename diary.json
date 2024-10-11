@@ -1,1 +1,20 @@
-[]
+[
+    {
+        "entry_date": "2024-10-11",
+        "summary": "今天完成了“上岸”的demo版，还非常不漂亮，但是基本功能有了实现模板，可复用的函数模板已经实现（models.py）。",
+        "category": "课内课程",
+        "tags": [
+            {
+                "name": "无",
+                "parent": null,
+                "knowledge_points": []
+            },
+            {
+                "name": "无",
+                "parent": null,
+                "knowledge_points": []
+            }
+        ],
+        "links": []
+    }
+]

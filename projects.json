@@ -213,12 +213,124 @@
             {
                 "name": "React",
                 "parent": "前端",
-                "knowledge_points": []
+                "knowledge_points": [
+                    {
+                        "content": "组件基础",
+                        "learned": false,
+                        "last_recall": null,
+                        "next_recall": null
+                    },
+                    {
+                        "content": "数据管理",
+                        "learned": false,
+                        "last_recall": null,
+                        "next_recall": null
+                    },
+                    {
+                        "content": "生命周期",
+                        "learned": false,
+                        "last_recall": null,
+                        "next_recall": null
+                    },
+                    {
+                        "content": "组件通信",
+                        "learned": false,
+                        "last_recall": null,
+                        "next_recall": null
+                    },
+                    {
+                        "content": "路由",
+                        "learned": false,
+                        "last_recall": null,
+                        "next_recall": null
+                    },
+                    {
+                        "content": "Redux",
+                        "learned": false,
+                        "last_recall": null,
+                        "next_recall": null
+                    },
+                    {
+                        "content": "React18",
+                        "learned": false,
+                        "last_recall": null,
+                        "next_recall": null
+                    },
+                    {
+                        "content": "虚拟DOM",
+                        "learned": false,
+                        "last_recall": null,
+                        "next_recall": null
+                    }
+                ]
             }
         ],
         "description": "使用Docusaurus搭建的个人博客，技术栈主要在前端和React生态",
         "progress": 100,
         "progress_history": [],
         "interest": 2
+    },
+    {
+        "name": "鱼皮OJ",
+        "due_date": "2025-01-31",
+        "abilities": [
+            {
+                "name": "Vue",
+                "parent": "前端",
+                "knowledge_points": [
+                    {
+                        "content": "生命周期",
+                        "learned": false,
+                        "last_recall": null,
+                        "next_recall": null
+                    },
+                    {
+                        "content": "组件通信",
+                        "learned": false,
+                        "last_recall": null,
+                        "next_recall": null
+                    },
+                    {
+                        "content": "路由",
+                        "learned": false,
+                        "last_recall": null,
+                        "next_recall": null
+                    },
+                    {
+                        "content": "Vuex",
+                        "learned": false,
+                        "last_recall": null,
+                        "next_recall": null
+                    },
+                    {
+                        "content": "Vue3.0",
+                        "learned": false,
+                        "last_recall": null,
+                        "next_recall": null
+                    },
+                    {
+                        "content": "虚拟DOM",
+                        "learned": false,
+                        "last_recall": null,
+                        "next_recall": null
+                    },
+                    {
+                        "content": "Vue性能优化",
+                        "learned": false,
+                        "last_recall": null,
+                        "next_recall": null
+                    }
+                ]
+            },
+            {
+                "name": "后端",
+                "parent": null,
+                "knowledge_points": []
+            }
+        ],
+        "description": "实现一个OJ",
+        "progress": 3,
+        "progress_history": [],
+        "interest": 3
     }
 ]

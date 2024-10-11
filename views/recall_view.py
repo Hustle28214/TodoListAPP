@@ -1,7 +1,7 @@
 # recall_view.py
 
 import tkinter as tk
-from tkinter import ttk, messagebox
+from tkinter import ttk, messagebox, simpledialog
 from datetime import datetime, timedelta
 import random
 from models import AbilityTag, KnowledgePoint
@@ -41,6 +41,9 @@ class RecallView:
         mark_recalled_button = tk.Button(recall_buttons_frame, text="标记为已回忆", command=self.mark_as_recalled)
         mark_recalled_button.pack(pady=5)
         
+        add_ability_button_recall = tk.Button(recall_buttons_frame, text="添加能力标签", command=lambda: self.add_ability_tag(recall_frame))
+        add_ability_button_recall.pack(pady=5)
+        
         # 绑定双击事件以查看知识点详情
         self.recall_listbox.bind("<Double-1>", self.on_double_click_recall)
         
@@ -60,6 +63,12 @@ class RecallView:
         
         start_learning_button = tk.Button(unlearned_buttons_frame, text="开始学习", command=self.start_learning)
         start_learning_button.pack(pady=5)
+        
+        change_batch_button = tk.Button(unlearned_buttons_frame, text="换一批", command=self.change_batch)
+        change_batch_button.pack(pady=5)
+        
+        add_ability_button_unlearned = tk.Button(unlearned_buttons_frame, text="添加能力标签", command=lambda: self.add_ability_tag(unlearned_frame))
+        add_ability_button_unlearned.pack(pady=5)
         
         # 绑定双击事件以查看未学习知识点详情（可选）
         self.unlearned_listbox.bind("<Double-1>", self.on_double_click_unlearned)
@@ -81,7 +90,9 @@ class RecallView:
         # 展示需要回忆的知识点
         self.recall_listbox.delete(0, tk.END)
         for ability_name, kp in self.due_recall_kps:
-            self.recall_listbox.insert(tk.END, f"能力标签: {ability_name} | 知识点: {kp.content} | 上次回忆: {kp.last_recall} | 下次回忆: {kp.next_recall}")
+            last_recall = kp.last_recall if kp.last_recall else "无"
+            next_recall = kp.next_recall if kp.next_recall else "无"
+            self.recall_listbox.insert(tk.END, f"能力标签: {ability_name} | 知识点: {kp.content} | 上次回忆: {last_recall} | 下次回忆: {next_recall}")
         
         # 随机选择6个未学习的知识点
         random.shuffle(self.unlearned_kps)
@@ -134,6 +145,22 @@ class RecallView:
         
         # 重新加载数据
         self.load_recall_data()
+    
+    def change_batch(self):
+        """
+        换一批新的未学习知识点。
+        """
+        if not self.unlearned_kps:
+            messagebox.showinfo("提示", "没有更多的未学习知识点可供选择。")
+            return
+        
+        random.shuffle(self.unlearned_kps)
+        self.today_unlearned_kps = self.unlearned_kps[:6]
+        
+        # 展示未学习的知识点
+        self.unlearned_listbox.delete(0, tk.END)
+        for kp in self.today_unlearned_kps:
+            self.unlearned_listbox.insert(tk.END, f"知识点: {kp.content}")
     
     def calculate_next_recall_date(self, last_recall_date, kp):
         """
@@ -209,8 +236,10 @@ class RecallView:
         
         tk.Label(info_frame, text=f"知识点: {kp.content}", font=("Microsoft YaHei", 12, "bold")).pack(anchor='w', pady=5)
         tk.Label(info_frame, text=f"所属能力标签: {ability_name}", font=("Microsoft YaHei", 11)).pack(anchor='w', pady=5)
-        tk.Label(info_frame, text=f"上次回忆: {kp.last_recall}", font=("Microsoft YaHei", 11)).pack(anchor='w', pady=5)
-        tk.Label(info_frame, text=f"下次回忆: {kp.next_recall}", font=("Microsoft YaHei", 11)).pack(anchor='w', pady=5)
+        last_recall = kp.last_recall if kp.last_recall else "无"
+        next_recall = kp.next_recall if kp.next_recall else "无"
+        tk.Label(info_frame, text=f"上次回忆: {last_recall}", font=("Microsoft YaHei", 11)).pack(anchor='w', pady=5)
+        tk.Label(info_frame, text=f"下次回忆: {next_recall}", font=("Microsoft YaHei", 11)).pack(anchor='w', pady=5)
         
         # 能力标签链
         chain = self.get_ability_chain(ability_name)
@@ -235,3 +264,70 @@ class RecallView:
             else:
                 current_name = None
         return chain[::-1]  # 从根到当前能力标签
+    
+    def add_ability_tag(self, parent_window):
+        """
+        添加新的能力标签。
+        
+        :param parent_window: 父窗口，用于定位对话框
+        """
+        new_tag = simpledialog.askstring("添加能力标签", "请输入新的能力标签:", parent=parent_window)
+        if new_tag:
+            if any(ability.name == new_tag for ability in self.abilities):
+                messagebox.showinfo("提示", "该能力标签已存在。")
+            else:
+                # 选择父能力标签（可选）
+                parent_options = ["无"] + [ability.name for ability in self.abilities if ability.parent is None]
+                parent_selected = self.select_parent_ability(parent_window, parent_options)
+                
+                if parent_selected is None:
+                    # 用户取消了选择
+                    return
+                
+                if parent_selected == "无":
+                    parent_selected = None
+                
+                new_ability = AbilityTag(name=new_tag, parent=parent_selected)
+                self.abilities.append(new_ability)
+                self.data_manager.save_abilities(self.abilities)
+                messagebox.showinfo("成功", "能力标签已添加。")
+                
+                # 更新列表框中的能力标签
+                children = parent_window.winfo_children()
+                for widget in children:
+                    if isinstance(widget, tk.Listbox):
+                        abilities_var = tk.Variable(value=[ability.name for ability in self.abilities])
+                        widget.config(listvariable=abilities_var)
+                        break
+    
+    def select_parent_ability(self, parent_window, options):
+        """
+        弹出一个对话框，让用户选择父能力标签。
+        
+        :param parent_window: 父窗口
+        :param options: 可供选择的父能力标签列表
+        :return: 选择的父能力标签名称或 None
+        """
+        selection_window = tk.Toplevel(parent_window)
+        selection_window.title("选择父能力标签")
+        selection_window.grab_set()  # 模态窗口
+        
+        tk.Label(selection_window, text="请选择父能力标签（可选）:").pack(padx=10, pady=10)
+        
+        selected_parent = tk.StringVar(value="无")
+        combobox = ttk.Combobox(selection_window, textvariable=selected_parent, values=options, state='readonly')
+        combobox.pack(padx=10, pady=5)
+        combobox.current(0)  # 默认选择“无”
+        
+        def confirm_selection():
+            selection_window.destroy()
+        
+        confirm_button = tk.Button(selection_window, text="确认", command=confirm_selection)
+        confirm_button.pack(pady=10)
+        
+        self.parent.wait_window(selection_window)
+        
+        if selected_parent.get() == "无":
+            return None
+        else:
+            return selected_parent.get()

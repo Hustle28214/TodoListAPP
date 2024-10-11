@@ -286,7 +286,7 @@
     },
     {
         "name": "DBSCAN",
-        "parent": "有监督学习",
+        "parent": "无监督学习",
         "knowledge_points": []
     },
     {
@@ -373,6 +373,41 @@
     {
         "name": "JavaScript语法",
         "parent": "JavaScript",
+        "knowledge_points": []
+    },
+    {
+        "name": "决策树",
+        "parent": "有监督学习",
+        "knowledge_points": []
+    },
+    {
+        "name": "逻辑回归",
+        "parent": "有监督学习",
+        "knowledge_points": []
+    },
+    {
+        "name": "naive bayes",
+        "parent": "有监督学习",
+        "knowledge_points": []
+    },
+    {
+        "name": "bagging & random forest",
+        "parent": "有监督学习",
+        "knowledge_points": []
+    },
+    {
+        "name": "神经网络",
+        "parent": "有监督学习",
+        "knowledge_points": []
+    },
+    {
+        "name": "KNN",
+        "parent": "有监督学习",
+        "knowledge_points": []
+    },
+    {
+        "name": "fm",
+        "parent": "有监督学习",
         "knowledge_points": []
     }
 ]
