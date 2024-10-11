@@ -227,3 +227,26 @@ class DailyProgress:
             notes=data.get('notes', ''),
             tags=tags
         )
+
+        # models.py
+
+class Goal:
+    def __init__(self, text, due_date, completed=False):
+        self.text = text
+        self.due_date = due_date
+        self.completed = completed
+
+    def to_dict(self):
+        return {
+            "text": self.text,
+            "due_date": self.due_date,
+            "completed": self.completed
+        }
+
+    @classmethod
+    def from_dict(cls, data):
+        return cls(
+            text=data.get("text", ""),
+            due_date=data.get("due_date", ""),
+            completed=data.get("completed", False)
+        )

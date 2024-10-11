@@ -2,7 +2,7 @@
 
 import json
 import os
-from models import Task, DiaryEntry, PeriodicSummary, Project, AbilityTag, DailyProgress
+from models import Task, DiaryEntry, PeriodicSummary, Project, AbilityTag, DailyProgress, Goal
 from collections import defaultdict
 import tempfile
 import shutil
@@ -16,6 +16,32 @@ class DataManager:
         self.projects_file = "projects.json"
         self.abilities_file = "abilities.json"
         self.daily_progress_file = "daily_progress.json"
+        self.goals_file = "goals.json"  # 添加目标文件路径
+
+    # ----------------- 目标数据管理 ----------------- #
+    def load_goals(self):
+        """从 JSON 文件加载目标"""
+        if os.path.exists(self.goals_file):
+            try:
+                with open(self.goals_file, 'r', encoding='utf-8') as f:
+                    data = json.load(f)
+                    return [Goal.from_dict(goal) for goal in data]
+            except json.JSONDecodeError as e:
+                print(f"加载目标时出错: {e}")
+                return []
+            except Exception as e:
+                print(f"加载目标时出错: {e}")
+                return []
+        return []
+
+    def save_goals(self, goals):
+        """将目标保存到 JSON 文件"""
+        try:
+            data = [goal.to_dict() for goal in goals]
+            with open(self.goals_file, 'w', encoding='utf-8') as f:
+                json.dump(data, f, ensure_ascii=False, indent=4)
+        except Exception as e:
+            print(f"保存目标时出错: {e}")
 
     # ----------------- 任务数据管理 ----------------- #
     def load_tasks(self):
@@ -140,7 +166,7 @@ class DataManager:
                     if not isinstance(ability, AbilityTag):
                         print(f"项目 '{project.name}' 的能力标签 '{ability}' 不是 AbilityTag 对象")
                         raise TypeError(f"能力标签必须是 AbilityTag 对象，但得到的是 '{type(ability)}'")
-            
+
             data = [project.to_dict() for project in projects]
 
             # 使用临时文件保存数据
@@ -178,7 +204,7 @@ class DataManager:
         except Exception as e:
             print(f"保存能力标签时出错: {e}")
 
-   # ----------------- 自动同步每日进度 ----------------- #
+    # ----------------- 自动同步每日进度 ----------------- #
     def synchronize_daily_progress(self):
         """
         根据任务的进度历史自动同步每日进度。
@@ -222,6 +248,7 @@ class DataManager:
         projects = self.load_projects()
         abilities = self.load_abilities()
         daily_progress = self.load_daily_progress()  # 加载每日进度
+        goals = self.load_goals()  # 加载目标
 
         # 同步每日进度
         self.synchronize_daily_progress()
@@ -233,10 +260,11 @@ class DataManager:
             'summaries': summaries,
             'projects': projects,
             'abilities': abilities,
-            'daily_progress': daily_progress  # 包含每日进度
+            'daily_progress': daily_progress,  # 包含每日进度
+            'goals': goals  # 包含目标
         }
 
-    def save_all_data(self, tasks, diary_entries, summaries, projects, abilities, daily_progress):
+    def save_all_data(self, tasks, diary_entries, summaries, projects, abilities, daily_progress, goals):
         """
         保存所有类型的数据。
         """
@@ -246,3 +274,4 @@ class DataManager:
         self.save_projects(projects)
         self.save_abilities(abilities)
         self.save_daily_progress(daily_progress)  # 保存每日进度
+        self.save_goals(goals)  # 保存目标

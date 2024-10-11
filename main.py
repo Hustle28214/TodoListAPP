@@ -123,7 +123,7 @@ def main():
     # 页脚
     footer = tk.Frame(root, bg="#4caf50", height=30)
     footer.pack(fill="x", side="bottom")
-    footer_label = tk.Label(footer, text="© 2024 上岸应用", bg="#4caf50", fg="white", font=("Microsoft YaHei", 10))
+    footer_label = tk.Label(footer, text="© 2024 Leyan Cai", bg="#4caf50", fg="white", font=("Microsoft YaHei", 10))
     footer_label.pack(pady=5)
 
     # 启动主循环

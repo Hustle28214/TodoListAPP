@@ -46,12 +46,17 @@
     },
     {
         "name": "EGO-Planner",
-        "parent": "ROS",
+        "parent": "无人机",
         "knowledge_points": []
     },
     {
         "name": "IC设计",
         "parent": null,
+        "knowledge_points": []
+    },
+    {
+        "name": "无人机",
+        "parent": "ROS",
         "knowledge_points": []
     }
 ]

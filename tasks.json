@@ -15,20 +15,6 @@
         ]
     },
     {
-        "name": "三维校赛",
-        "due_date": "2024-10-11",
-        "interest": 2,
-        "description": "",
-        "abilities": [
-            {
-                "name": "SolidWorks",
-                "parent": null
-            }
-        ],
-        "progress": 0,
-        "progress_history": []
-    },
-    {
         "name": "机电传动控制作业10.14",
         "due_date": "2024-10-14",
         "interest": 2,
@@ -42,5 +28,74 @@
                 22
             ]
         ]
+    },
+    {
+        "name": "信号与系统作业",
+        "due_date": "2024-10-17",
+        "interest": 3,
+        "description": "4.32(a)(b) 4.33(a)(b)",
+        "abilities": [
+            {
+                "name": "信号",
+                "parent": null,
+                "knowledge_points": []
+            }
+        ],
+        "progress": 0,
+        "progress_history": []
+    },
+    {
+        "name": "一生一芯预学习",
+        "due_date": "2024-11-01",
+        "interest": 3,
+        "description": "趁着LINUX学完了，学完剩下的东西吧。\n链接：https://missing-semester-cn.github.io/",
+        "abilities": [
+            {
+                "name": "IC设计",
+                "parent": null,
+                "knowledge_points": []
+            }
+        ],
+        "progress": 0,
+        "progress_history": []
+    },
+    {
+        "name": "数字图像处理作业",
+        "due_date": "2024-10-14",
+        "interest": 2,
+        "description": "已完成，需要北化在线提交并撰写报告",
+        "abilities": [],
+        "progress": 0,
+        "progress_history": []
+    },
+    {
+        "name": "华为ICT大赛-网络赛道",
+        "due_date": "2024-11-02",
+        "interest": 2,
+        "description": "看课，做题，背题库，抽空做",
+        "abilities": [
+            {
+                "name": "网络",
+                "parent": null,
+                "knowledge_points": []
+            }
+        ],
+        "progress": 0,
+        "progress_history": []
+    },
+    {
+        "name": "RoboCup",
+        "due_date": "2024-10-18",
+        "interest": 3,
+        "description": "等待校赛晋级通知",
+        "abilities": [
+            {
+                "name": "ROS",
+                "parent": null,
+                "knowledge_points": []
+            }
+        ],
+        "progress": 0,
+        "progress_history": []
     }
 ]

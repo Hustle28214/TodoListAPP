@@ -31,7 +31,7 @@
             },
             {
                 "name": "APP",
-                "parent": null,
+                "parent": "前端",
                 "knowledge_points": []
             }
         ],
@@ -63,7 +63,7 @@
     },
     {
         "name": "软著：项目管理系统",
-        "due_date": "2024-10-11",
+        "due_date": "2024-10-18",
         "abilities": [
             {
                 "name": "无",
@@ -93,7 +93,7 @@
     },
     {
         "name": "英蓝杯",
-        "due_date": "2024-10-11",
+        "due_date": "2024-10-14",
         "abilities": [
             {
                 "name": "SolidWorks",
@@ -138,8 +138,14 @@
             }
         ],
         "description": "需要过考核，10道简单，4道中等，1道困难。打开火狐刷题。",
-        "progress": 0,
-        "progress_history": [],
+        "progress": 7,
+        "progress_history": [
+            [
+                "2024-10-11 14:10:07",
+                "2道简单已完成",
+                7
+            ]
+        ],
         "interest": 3
     }
 ]
