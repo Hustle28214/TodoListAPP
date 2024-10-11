@@ -39,12 +39,6 @@ class TasksView:
         update_progress_button = tk.Button(buttons_frame, text="更新进度", command=self.update_progress)
         update_progress_button.pack(side=tk.LEFT, padx=5)
 
-        # view_button = tk.Button(buttons_frame, text="查看详情", command=self.view_task)
-        # view_button.pack(side=tk.LEFT, padx=5)
-
-        # manage_abilities_button = tk.Button(buttons_frame, text="管理能力标签", command=self.manage_abilities)
-        # manage_abilities_button.pack(side=tk.LEFT, padx=5)
-
         # Treeview（任务列表）
         columns = ("Name", "Due Date", "Interest", "Ability", "Description", "Progress", "Type")
         self.tree = ttk.Treeview(self.frame, columns=columns, show='headings', selectmode='browse')
@@ -165,22 +159,29 @@ class TasksView:
         interest_spin = tk.Spinbox(add_window, from_=1, to=5, textvariable=interest_var, width=5)
         interest_spin.grid(row=2, column=1, padx=10, pady=5, sticky=tk.W)
 
-        # 能力标签
-        tk.Label(add_window, text="能力标签:").grid(row=3, column=0, padx=10, pady=5, sticky=tk.W)
+        # 能力标签搜索框
+        tk.Label(add_window, text="搜索能力标签:").grid(row=3, column=0, padx=10, pady=5, sticky=tk.W)
+        search_entry = tk.Entry(add_window, width=30)
+        search_entry.grid(row=3, column=1, padx=10, pady=5)
 
-        # 使用 Listbox 允许多选
+        # 能力标签列表框
+        tk.Label(add_window, text="能力标签:").grid(row=4, column=0, padx=10, pady=5, sticky=tk.W)
+
         abilities_var = tk.Variable(value=[tag.name for tag in self.abilities])
         abilities_listbox = tk.Listbox(add_window, listvariable=abilities_var, selectmode='multiple', height=5)
-        abilities_listbox.grid(row=3, column=1, padx=10, pady=5, sticky=tk.W)
+        abilities_listbox.grid(row=4, column=1, padx=10, pady=5, sticky=tk.W)
 
-        add_ability_button = tk.Button(add_window, text="添加能力标签", command=lambda: self.add_ability_tag(add_window, abilities_listbox))
-        add_ability_button.grid(row=3, column=2, padx=5, pady=5)
+        # 添加能力标签按钮
+        add_ability_button = tk.Button(add_window, text="添加能力标签", command=lambda: self.add_ability_tag(add_window))
+        add_ability_button.grid(row=4, column=2, padx=5, pady=5)
 
-        # 是否为项目
-        tk.Label(add_window, text="是否为项目:").grid(row=4, column=0, padx=10, pady=5, sticky=tk.W)
-        is_project_var = tk.BooleanVar()
-        is_project_check = tk.Checkbutton(add_window, variable=is_project_var, text="是")
-        is_project_check.grid(row=4, column=1, padx=10, pady=5, sticky=tk.W)
+        # 实现搜索功能
+        def search_abilities(event):
+            search_term = search_entry.get().lower()
+            filtered_abilities = [tag.name for tag in self.abilities if search_term in tag.name.lower()]
+            abilities_var.set(filtered_abilities)
+
+        search_entry.bind("<KeyRelease>", search_abilities)  # 动态搜索功能
 
         # 详细描述
         tk.Label(add_window, text="详细描述:").grid(row=5, column=0, padx=10, pady=5, sticky=tk.NW)
@@ -196,43 +197,25 @@ class TasksView:
             except ValueError:
                 interest = 0
 
-            # 获取选择的多个能力标签
             selected_indices = abilities_listbox.curselection()
             selected_abilities = [self.abilities[i] for i in selected_indices]
-
-            is_project = is_project_var.get()
             description = description_text.get("1.0", tk.END).strip()
 
             if not name:
                 messagebox.showwarning("警告", "任务名称不能为空！")
                 return
 
-            # 检查名称唯一性
-            if is_project:
-                if any(p.name == name for p in self.projects):
-                    messagebox.showwarning("警告", "该项目名称已存在！")
-                    return
-                new_project = Project(name, due_date, selected_abilities, description, progress=0, interest=interest)
-                self.projects.append(new_project)
-                self.data_manager.save_projects(self.projects)
-            else:
-                if any(t.name == name for t in self.tasks):
-                    messagebox.showwarning("警告", "该任务名称已存在！")
-                    return
-                new_task = Task(name, due_date, interest, description, abilities=selected_abilities, progress=0)
-                self.tasks.append(new_task)
-                self.data_manager.save_tasks(self.tasks)
-
-            # 同步每日进度
-            self.data_manager.synchronize_daily_progress()
-
+            new_task = Task(name, due_date, interest, description, abilities=selected_abilities, progress=0)
+            self.tasks.append(new_task)
+            self.data_manager.save_tasks(self.tasks)
             self.refresh_treeview()
             add_window.destroy()
+            display_info("成功", "任务已添加。")
 
         add_button = tk.Button(add_window, text="添加", command=add_task)
         add_button.grid(row=6, column=0, columnspan=3, pady=10)
 
-    def add_ability_tag(self, parent_window, abilities_listbox):
+    def add_ability_tag(self, parent_window, abilities_listbox=None):
         new_tag = simpledialog.askstring("添加能力标签", "请输入新的能力标签:", parent=parent_window)
         if new_tag:
             if any(ability.name == new_tag for ability in self.abilities):
@@ -243,7 +226,16 @@ class TasksView:
                 self.data_manager.save_abilities(self.abilities)
                 display_info("成功", "能力标签已添加。")
                 # 更新 Listbox 中的能力标签
-                abilities_listbox.insert(tk.END, new_tag)
+                if abilities_listbox:
+                    abilities_listbox.insert(tk.END, new_tag)
+                else:
+                    # If no specific listbox is provided, update all listboxes in the parent window
+                    children = parent_window.winfo_children()
+                    for widget in children:
+                        if isinstance(widget, tk.Listbox):
+                            abilities_var = tk.Variable(value=[ability.name for ability in self.abilities])
+                            widget.config(listvariable=abilities_var)
+                            break
 
     def edit_task(self):
         selected_item = self.tree.selection()
@@ -285,10 +277,16 @@ class TasksView:
             # 能力标签
             tk.Label(edit_window, text="能力标签:").grid(row=3, column=0, padx=10, pady=5, sticky=tk.W)
 
-            # 使用 Listbox 允许多选
+            # 搜索能力标签
+            search_label = tk.Label(edit_window, text="搜索能力标签:")
+            search_label.grid(row=4, column=0, padx=10, pady=5, sticky=tk.W)
+            search_entry = tk.Entry(edit_window, width=30)
+            search_entry.grid(row=4, column=1, padx=10, pady=5, sticky=tk.W)
+
+            # 能力标签列表框
             abilities_var = tk.Variable(value=[tag.name for tag in self.abilities])
             abilities_listbox = tk.Listbox(edit_window, listvariable=abilities_var, selectmode='multiple', height=5)
-            abilities_listbox.grid(row=3, column=1, padx=10, pady=5, sticky=tk.W)
+            abilities_listbox.grid(row=5, column=1, padx=10, pady=5, sticky=tk.W)
 
             # 预先选择当前任务的能力标签
             current_ability_names = [ability.name for ability in task.abilities]
@@ -297,17 +295,25 @@ class TasksView:
                     abilities_listbox.select_set(idx)
 
             add_ability_button = tk.Button(edit_window, text="添加能力标签", command=lambda: self.add_ability_tag(edit_window, abilities_listbox))
-            add_ability_button.grid(row=3, column=2, padx=5, pady=5)
+            add_ability_button.grid(row=5, column=2, padx=5, pady=5)
+
+            # 实现搜索功能
+            def search_abilities(event):
+                search_term = search_entry.get().lower()
+                filtered_abilities = [tag.name for tag in self.abilities if search_term in tag.name.lower()]
+                abilities_var.set(filtered_abilities)
+
+            search_entry.bind("<KeyRelease>", search_abilities)
 
             # 类型（不可修改）
-            tk.Label(edit_window, text="类型:").grid(row=4, column=0, padx=10, pady=5, sticky=tk.W)
-            tk.Label(edit_window, text=task_type).grid(row=4, column=1, padx=10, pady=5, sticky=tk.W)
+            tk.Label(edit_window, text="类型:").grid(row=6, column=0, padx=10, pady=5, sticky=tk.W)
+            tk.Label(edit_window, text=task_type).grid(row=6, column=1, padx=10, pady=5, sticky=tk.W)
 
             # 详细描述
-            tk.Label(edit_window, text="详细描述:").grid(row=5, column=0, padx=10, pady=5, sticky=tk.NW)
+            tk.Label(edit_window, text="详细描述:").grid(row=7, column=0, padx=10, pady=5, sticky=tk.NW)
             description_text = tk.Text(edit_window, width=30, height=5)
             description_text.insert("1.0", task.description)
-            description_text.grid(row=5, column=1, padx=10, pady=5)
+            description_text.grid(row=7, column=1, padx=10, pady=5)
 
             # 保存按钮
             def save_changes():
@@ -355,9 +361,10 @@ class TasksView:
 
                 self.refresh_treeview()
                 edit_window.destroy()
+                display_info("成功", "任务已更新。")
 
             save_button = tk.Button(edit_window, text="保存修改", command=save_changes)
-            save_button.grid(row=6, column=0, columnspan=3, pady=10)
+            save_button.grid(row=8, column=0, columnspan=3, pady=10)
         else:
             messagebox.showwarning("警告", "请选择要修改的任务！")
 
@@ -389,6 +396,7 @@ class TasksView:
                 self.data_manager.synchronize_daily_progress()
 
                 self.refresh_treeview()
+                display_info("成功", f"{task_type}已删除。")
         else:
             messagebox.showwarning("警告", "请选择要删除的任务！")
 
@@ -491,6 +499,7 @@ class TasksView:
 
                 self.refresh_treeview()
                 progress_window.destroy()
+                display_info("成功", "进度已更新。")
 
             save_button = tk.Button(progress_window, text="保存", command=save_progress)
             save_button.pack(pady=10)

@@ -98,29 +98,45 @@ class ProjectsView:
 
         # 能力标签
         tk.Label(add_window, text="能力标签:").grid(row=2, column=0, padx=10, pady=5, sticky=tk.W)
+        
+        # 搜索能力标签
+        search_label = tk.Label(add_window, text="搜索能力标签:")
+        search_label.grid(row=3, column=0, padx=10, pady=5, sticky=tk.W)
+        search_entry = tk.Entry(add_window, width=30)
+        search_entry.grid(row=3, column=1, padx=10, pady=5, sticky=tk.W)
+
+        # 能力标签列表框
         abilities_var = tk.Variable(value=[ability.name for ability in self.abilities])
         abilities_listbox = tk.Listbox(add_window, listvariable=abilities_var, selectmode='multiple', height=5)
-        abilities_listbox.grid(row=2, column=1, padx=10, pady=5, sticky=tk.W)
+        abilities_listbox.grid(row=4, column=1, padx=10, pady=5, sticky=tk.W)
 
         add_ability_button = tk.Button(add_window, text="添加能力标签", command=lambda: self.add_ability_tag(add_window))
-        add_ability_button.grid(row=2, column=2, padx=5, pady=5)
+        add_ability_button.grid(row=4, column=2, padx=5, pady=5)
+
+        # 实现搜索功能
+        def search_abilities(event):
+            search_term = search_entry.get().lower()
+            filtered_abilities = [tag.name for tag in self.abilities if search_term in tag.name.lower()]
+            abilities_var.set(filtered_abilities)
+
+        search_entry.bind("<KeyRelease>", search_abilities)
 
         # 详细描述
-        tk.Label(add_window, text="详细描述:").grid(row=3, column=0, padx=10, pady=5, sticky=tk.NW)
+        tk.Label(add_window, text="详细描述:").grid(row=5, column=0, padx=10, pady=5, sticky=tk.NW)
         description_text = tk.Text(add_window, width=30, height=5)
-        description_text.grid(row=3, column=1, padx=10, pady=5)
+        description_text.grid(row=5, column=1, padx=10, pady=5)
 
         # 进度
-        tk.Label(add_window, text="进度 (%):").grid(row=4, column=0, padx=10, pady=5, sticky=tk.W)
+        tk.Label(add_window, text="进度 (%):").grid(row=6, column=0, padx=10, pady=5, sticky=tk.W)
         progress_var = tk.IntVar(value=0)
         progress_scale = tk.Scale(add_window, from_=0, to=100, orient=tk.HORIZONTAL, variable=progress_var)
-        progress_scale.grid(row=4, column=1, padx=10, pady=5, sticky=tk.W)
+        progress_scale.grid(row=6, column=1, padx=10, pady=5, sticky=tk.W)
 
         # 感兴趣程度（可选）
-        tk.Label(add_window, text="感兴趣程度 (可选, 1-5):").grid(row=5, column=0, padx=10, pady=5, sticky=tk.W)
+        tk.Label(add_window, text="感兴趣程度 (可选, 1-5):").grid(row=7, column=0, padx=10, pady=5, sticky=tk.W)
         interest_var = tk.IntVar()
         interest_spin = tk.Spinbox(add_window, from_=1, to=5, textvariable=interest_var, width=5)
-        interest_spin.grid(row=5, column=1, padx=10, pady=5, sticky=tk.W)
+        interest_spin.grid(row=7, column=1, padx=10, pady=5, sticky=tk.W)
 
         # 添加按钮
         def add_project():
@@ -156,7 +172,7 @@ class ProjectsView:
             display_info("成功", "项目已添加。")
 
         add_button = tk.Button(add_window, text="添加", command=add_project)
-        add_button.grid(row=6, column=0, columnspan=3, pady=10)
+        add_button.grid(row=8, column=0, columnspan=3, pady=10)
 
     def add_ability_tag(self, parent_window):
         """
@@ -203,14 +219,22 @@ class ProjectsView:
             # 截止日期
             tk.Label(edit_window, text="截止日期:").grid(row=1, column=0, padx=10, pady=5, sticky=tk.W)
             cal = Calendar(edit_window, selectmode='day', date_pattern='yyyy-mm-dd')
-            cal.set_date(project.due_date)
+            cal.selection_set(project.due_date)
             cal.grid(row=1, column=1, padx=10, pady=5)
 
             # 能力标签
             tk.Label(edit_window, text="能力标签:").grid(row=2, column=0, padx=10, pady=5, sticky=tk.W)
+            
+            # 搜索能力标签
+            search_label = tk.Label(edit_window, text="搜索能力标签:")
+            search_label.grid(row=3, column=0, padx=10, pady=5, sticky=tk.W)
+            search_entry = tk.Entry(edit_window, width=30)
+            search_entry.grid(row=3, column=1, padx=10, pady=5, sticky=tk.W)
+
+            # 能力标签列表框
             abilities_var = tk.Variable(value=[ability.name for ability in self.abilities])
             abilities_listbox = tk.Listbox(edit_window, listvariable=abilities_var, selectmode='multiple', height=5)
-            abilities_listbox.grid(row=2, column=1, padx=10, pady=5, sticky=tk.W)
+            abilities_listbox.grid(row=4, column=1, padx=10, pady=5, sticky=tk.W)
 
             # 预先选择当前项目的能力标签
             current_ability_names = [ability.name for ability in project.abilities]
@@ -219,25 +243,33 @@ class ProjectsView:
                     abilities_listbox.select_set(idx)
 
             add_ability_button = tk.Button(edit_window, text="添加能力标签", command=lambda: self.add_ability_tag(edit_window))
-            add_ability_button.grid(row=2, column=2, padx=5, pady=5)
+            add_ability_button.grid(row=4, column=2, padx=5, pady=5)
+
+            # 实现搜索功能
+            def search_abilities(event):
+                search_term = search_entry.get().lower()
+                filtered_abilities = [tag.name for tag in self.abilities if search_term in tag.name.lower()]
+                abilities_var.set(filtered_abilities)
+
+            search_entry.bind("<KeyRelease>", search_abilities)
 
             # 详细描述
-            tk.Label(edit_window, text="详细描述:").grid(row=3, column=0, padx=10, pady=5, sticky=tk.NW)
+            tk.Label(edit_window, text="详细描述:").grid(row=5, column=0, padx=10, pady=5, sticky=tk.NW)
             description_text = tk.Text(edit_window, width=30, height=5)
             description_text.insert("1.0", project.description)
-            description_text.grid(row=3, column=1, padx=10, pady=5)
+            description_text.grid(row=5, column=1, padx=10, pady=5)
 
             # 进度
-            tk.Label(edit_window, text="进度 (%):").grid(row=4, column=0, padx=10, pady=5, sticky=tk.W)
+            tk.Label(edit_window, text="进度 (%):").grid(row=6, column=0, padx=10, pady=5, sticky=tk.W)
             progress_var = tk.IntVar(value=project.progress)
             progress_scale = tk.Scale(edit_window, from_=0, to=100, orient=tk.HORIZONTAL, variable=progress_var)
-            progress_scale.grid(row=4, column=1, padx=10, pady=5, sticky=tk.W)
+            progress_scale.grid(row=6, column=1, padx=10, pady=5, sticky=tk.W)
 
             # 感兴趣程度（可选）
-            tk.Label(edit_window, text="感兴趣程度 (可选, 1-5):").grid(row=5, column=0, padx=10, pady=5, sticky=tk.W)
+            tk.Label(edit_window, text="感兴趣程度 (可选, 1-5):").grid(row=7, column=0, padx=10, pady=5, sticky=tk.W)
             interest_var = tk.IntVar(value=project.interest if project.interest is not None else 0)
             interest_spin = tk.Spinbox(edit_window, from_=1, to=5, textvariable=interest_var, width=5)
-            interest_spin.grid(row=5, column=1, padx=10, pady=5, sticky=tk.W)
+            interest_spin.grid(row=7, column=1, padx=10, pady=5, sticky=tk.W)
 
             # 保存按钮
             def save_changes():
@@ -254,7 +286,7 @@ class ProjectsView:
                     return
 
                 # 检查兴趣程度是否在1-5范围内
-                if interest is not None and interest != 0:
+                if interest is not None:
                     try:
                         interest = int(interest)
                         if not (1 <= interest <= 5):
@@ -278,7 +310,7 @@ class ProjectsView:
                 display_info("成功", "项目已更新。")
 
             save_button = tk.Button(edit_window, text="保存修改", command=save_changes)
-            save_button.grid(row=6, column=0, columnspan=3, pady=10)
+            save_button.grid(row=8, column=0, columnspan=3, pady=10)
         else:
             messagebox.showwarning("警告", "请选择要修改的项目！")
 

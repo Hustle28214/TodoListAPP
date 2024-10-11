@@ -168,10 +168,10 @@ class AbilitiesView:
 
         # 创建复选框列表
         self.kp_vars = []
-        for idx, kp in enumerate(ability.knowledge_points):
+        for kp in ability.knowledge_points:
             var = tk.BooleanVar(value=kp.learned)
             cb = tk.Checkbutton(scrollable_frame, text=kp.content, variable=var,
-                                command=lambda idx=idx, var=var: self.update_kp_status(ability, idx, var))
+                                command=lambda kp=kp, var=var: self.update_kp_status(ability, kp, var))
             cb.pack(anchor='w', pady=2)
             self.kp_vars.append(var)
 
@@ -199,11 +199,11 @@ class AbilitiesView:
         close_button = tk.Button(kp_window, text="关闭", command=kp_window.destroy)
         close_button.pack(pady=10)
 
-    def update_kp_status(self, ability, idx, var):
+    def update_kp_status(self, ability, kp, var):
         """
         更新知识点的学习状态。
         """
-        ability.knowledge_points[idx].learned = var.get()
+        kp.learned = var.get()
         self.data_manager.save_abilities(self.abilities)
 
     def add_knowledge_point(self, ability, parent_frame):
@@ -218,7 +218,7 @@ class AbilitiesView:
             # 添加新的复选框
             var = tk.BooleanVar(value=new_kp.learned)
             cb = tk.Checkbutton(parent_frame, text=new_kp.content, variable=var,
-                                command=lambda idx=len(ability.knowledge_points)-1, var=var: self.update_kp_status(ability, idx, var))
+                                command=lambda kp=new_kp, var=var: self.update_kp_status(ability, kp, var))
             cb.pack(anchor='w', pady=2)
             self.kp_vars.append(var)
             display_info("成功", "知识点已添加。")
@@ -237,11 +237,14 @@ class AbilitiesView:
         if confirm:
             # 删除从后向前，避免索引错乱
             for idx in sorted(selected_indices, reverse=True):
+                if idx >= len(ability.knowledge_points):
+                    continue  # 防止索引超出范围
+                kp_to_delete = ability.knowledge_points[idx].content
                 ability.knowledge_points.pop(idx)
                 self.kp_vars.pop(idx)
                 # 找到对应的复选框并销毁
                 for child in parent_frame.winfo_children():
-                    if isinstance(child, tk.Checkbutton) and child.cget("text") == ability.knowledge_points[idx].content:
+                    if isinstance(child, tk.Checkbutton) and child.cget("text") == kp_to_delete:
                         child.destroy()
                         break
             self.data_manager.save_abilities(self.abilities)
@@ -555,3 +558,4 @@ class AbilitiesView:
         # 关闭按钮
         close_button = tk.Button(details_window, text="关闭", command=details_window.destroy)
         close_button.pack(pady=10)
+
