@@ -8,14 +8,18 @@ from views.diary_view import DiaryView
 from views.summary_view import SummaryView
 from views.abilities_view import AbilitiesView
 from views.projects_view import ProjectsView
-from views.daily_progress_view import DailyProgressView  # 导入 DailyProgressView
+from views.daily_progress_view import DailyProgressView
+from views.analysis_view import AnalysisView  # 导入 AnalysisView
+from views.goals_view import GoalsView  # 导入 GoalsView
 from models import AbilityTag
+
+from views.pomodoro_view import PomodoroView  # 导入 PomodoroView
 
 def main():
     # 初始化主窗口
     root = tk.Tk()
     root.title("上岸")
-    root.geometry("1000x700")  # 调整窗口大小以适应更多内容
+    root.geometry("1000x700")
 
     # 设置窗口图标
     try:
@@ -41,7 +45,7 @@ def main():
     # 创建“拱卒”标签页
     daily_progress_frame = ttk.Frame(notebook)
     notebook.add(daily_progress_frame, text='拱卒')
-    DailyProgressView(daily_progress_frame, data_manager, abilities)  # 添加 DailyProgressView
+    DailyProgressView(daily_progress_frame, data_manager, abilities)
 
     # 创建“日记”标签页
     diary_frame = ttk.Frame(notebook)
@@ -62,6 +66,21 @@ def main():
     projects_frame = ttk.Frame(notebook)
     notebook.add(projects_frame, text='高楼')
     ProjectsView(projects_frame, data_manager, abilities)
+
+    # 创建“目标”标签页
+    goals_frame = ttk.Frame(notebook)
+    notebook.add(goals_frame, text="目标")
+    GoalsView(goals_frame, data_manager)
+
+    # 创建“数据分析”标签页
+    analysis_frame = ttk.Frame(notebook)
+    notebook.add(analysis_frame, text="分析")
+    AnalysisView(analysis_frame, data_manager, abilities)
+
+    # 创建“番茄钟”标签页
+    pomodoro_frame = ttk.Frame(notebook)
+    notebook.add(pomodoro_frame, text="番茄钟")
+    PomodoroView(pomodoro_frame)
 
     # 启动主循环
     root.mainloop()
