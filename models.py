@@ -1,23 +1,29 @@
 # models.py
 
+
 class KnowledgePoint:
-    def __init__(self, content, learned=False):
+    def __init__(self, content, learned=False, last_recall=None, next_recall=None):
         self.content = content
         self.learned = learned
+        self.last_recall = last_recall  # 字符串格式：YYYY-MM-DD 或 None
+        self.next_recall = next_recall  # 字符串格式：YYYY-MM-DD 或 None
 
     def to_dict(self):
         return {
             'content': self.content,
-            'learned': self.learned
+            'learned': self.learned,
+            'last_recall': self.last_recall,
+            'next_recall': self.next_recall
         }
 
     @staticmethod
     def from_dict(data):
         return KnowledgePoint(
             content=data['content'],
-            learned=data.get('learned', False)
+            learned=data.get('learned', False),
+            last_recall=data.get('last_recall'),
+            next_recall=data.get('next_recall')
         )
-
 
 class AbilityTag:
     def __init__(self, name, parent=None, knowledge_points=None):

@@ -3,5 +3,15 @@
         "text": "CSDN博客专家：500粉+20w阅读量",
         "due_date": "2025-01-30",
         "completed": false
+    },
+    {
+        "text": "华为云享专家申请",
+        "due_date": "2024-12-31",
+        "completed": false
+    },
+    {
+        "text": "腾讯云乘风者计划",
+        "due_date": "2024-12-31",
+        "completed": false
     }
 ]

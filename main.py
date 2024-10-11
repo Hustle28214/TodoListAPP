@@ -9,6 +9,7 @@ from views.projects_view import ProjectsView
 from views.daily_progress_view import DailyProgressView
 from views.analysis_view import AnalysisView  # 导入 AnalysisView
 from views.goals_view import GoalsView  # 导入 GoalsView
+from views.recall_view import RecallView
 from models import AbilityTag
 from views.pomodoro_view import PomodoroView  # 导入 PomodoroView
 
@@ -100,6 +101,11 @@ def main():
     notebook.add(abilities_frame, text='宝物')
     AbilitiesView(abilities_frame, data_manager)
 
+    # 创建“回忆知识点”标签页
+    recall_frame = ttk.Frame(notebook)
+    notebook.add(recall_frame, text="峥嵘")
+    RecallView(recall_frame,data_manager)
+
     # 创建“项目”标签页
     projects_frame = ttk.Frame(notebook)
     notebook.add(projects_frame, text='高楼')
@@ -107,17 +113,17 @@ def main():
 
     # 创建“目标”标签页
     goals_frame = ttk.Frame(notebook)
-    notebook.add(goals_frame, text="目标")
+    notebook.add(goals_frame, text="插旗")
     GoalsView(goals_frame, data_manager)
 
     # 创建“数据分析”标签页
     analysis_frame = ttk.Frame(notebook)
-    notebook.add(analysis_frame, text="分析")
+    notebook.add(analysis_frame, text="鉴证")
     AnalysisView(analysis_frame, data_manager, abilities)
 
     # 创建“番茄钟”标签页
     pomodoro_frame = ttk.Frame(notebook)
-    notebook.add(pomodoro_frame, text="番茄钟")
+    notebook.add(pomodoro_frame, text="心流")
     PomodoroView(pomodoro_frame)
 
     # 页脚

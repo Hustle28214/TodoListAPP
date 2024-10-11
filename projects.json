@@ -147,5 +147,47 @@
             ]
         ],
         "interest": 3
+    },
+    {
+        "name": "DataWhale: llm-universe RAG",
+        "due_date": "2024-05-30",
+        "abilities": [],
+        "description": "2024年5月的组队学习内容：RAG框架项目，可以复用，落地一个streamlit",
+        "progress": 71,
+        "progress_history": [],
+        "interest": 4
+    },
+    {
+        "name": "软著：ImaGenPro",
+        "due_date": "2024-09-10",
+        "abilities": [],
+        "description": "iGEM的Software",
+        "progress": 100,
+        "progress_history": [],
+        "interest": 2
+    },
+    {
+        "name": "简历网站",
+        "due_date": "2023-12-30",
+        "abilities": [
+            {
+                "name": "前端",
+                "parent": null,
+                "knowledge_points": []
+            }
+        ],
+        "description": "www.alittlemathbox.site",
+        "progress": 100,
+        "progress_history": [],
+        "interest": 1
+    },
+    {
+        "name": "个人博客",
+        "due_date": "2024-09-01",
+        "abilities": [],
+        "description": "使用Docusaurus搭建的个人博客，技术栈主要在前端和React生态",
+        "progress": 0,
+        "progress_history": [],
+        "interest": 2
     }
 ]

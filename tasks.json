@@ -5,12 +5,17 @@
         "interest": 2,
         "description": "周五晚上18:00前记得交",
         "abilities": [],
-        "progress": 72,
+        "progress": 100,
         "progress_history": [
             [
                 "2024-10-11 01:16:15",
                 "第一题已经完成",
                 72
+            ],
+            [
+                "2024-10-11 15:30:58",
+                "不用交",
+                100
             ]
         ]
     },
@@ -95,7 +100,13 @@
                 "knowledge_points": []
             }
         ],
-        "progress": 0,
-        "progress_history": []
+        "progress": 31,
+        "progress_history": [
+            [
+                "2024-10-11 17:28:36",
+                "等待校赛晋级通知",
+                31
+            ]
+        ]
     }
 ]
