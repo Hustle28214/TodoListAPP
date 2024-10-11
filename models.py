@@ -1,19 +1,42 @@
 # models.py
 
-class AbilityTag:
-    def __init__(self, name, parent=None):
-        self.name = name
-        self.parent = parent  # 父能力标签名称，默认为 None
+class KnowledgePoint:
+    def __init__(self, content, learned=False):
+        self.content = content
+        self.learned = learned
 
     def to_dict(self):
         return {
-            'name': self.name,
-            'parent': self.parent
+            'content': self.content,
+            'learned': self.learned
         }
 
     @staticmethod
     def from_dict(data):
-        return AbilityTag(name=data['name'], parent=data.get('parent'))
+        return KnowledgePoint(
+            content=data['content'],
+            learned=data.get('learned', False)
+        )
+
+
+class AbilityTag:
+    def __init__(self, name, parent=None, knowledge_points=None):
+        self.name = name
+        self.parent = parent  # 父能力标签名称，默认为 None
+        self.knowledge_points = knowledge_points if knowledge_points else []  # List of KnowledgePoint
+
+    def to_dict(self):
+        return {
+            'name': self.name,
+            'parent': self.parent,
+            'knowledge_points': [kp.to_dict() for kp in self.knowledge_points]
+        }
+
+    @staticmethod
+    def from_dict(data):
+        knowledge_points_data = data.get('knowledge_points', [])
+        knowledge_points = [KnowledgePoint.from_dict(kp) for kp in knowledge_points_data]
+        return AbilityTag(name=data['name'], parent=data.get('parent'), knowledge_points=knowledge_points)
 
 
 class Task:

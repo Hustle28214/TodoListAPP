@@ -5,7 +5,8 @@
         "abilities": [
             {
                 "name": "SolidWorks",
-                "parent": null
+                "parent": null,
+                "knowledge_points": []
             }
         ],
         "description": "任务已经划分，主要负责小车的驱动部分，即温差驱动设计。",
@@ -25,11 +26,13 @@
         "abilities": [
             {
                 "name": "前端",
-                "parent": null
+                "parent": null,
+                "knowledge_points": []
             },
             {
                 "name": "APP",
-                "parent": null
+                "parent": null,
+                "knowledge_points": []
             }
         ],
         "description": "iGEM的最后一舞，仿照基因检测报告的APP。",
@@ -49,7 +52,8 @@
         "abilities": [
             {
                 "name": "机器学习",
-                "parent": null
+                "parent": null,
+                "knowledge_points": []
             }
         ],
         "description": "文书写作，理解-深入细节-写作-深入细节-优化文本",
@@ -63,7 +67,8 @@
         "abilities": [
             {
                 "name": "无",
-                "parent": null
+                "parent": null,
+                "knowledge_points": []
             }
         ],
         "description": "本项目的软著写作，需要撰写项目文档，可能转手做。",
@@ -77,7 +82,8 @@
         "abilities": [
             {
                 "name": "ROS",
-                "parent": null
+                "parent": null,
+                "knowledge_points": []
             }
         ],
         "description": "需要学完赵虚左老师的ROS教程。",
@@ -91,12 +97,49 @@
         "abilities": [
             {
                 "name": "SolidWorks",
-                "parent": null
+                "parent": null,
+                "knowledge_points": []
             }
         ],
         "description": "初步调研完成，需要开始建模，磁环和内腔都有基本的思路",
         "progress": 0,
         "progress_history": [],
         "interest": 4
+    },
+    {
+        "name": "炫动LED",
+        "due_date": "2024-11-05",
+        "abilities": [
+            {
+                "name": "PCB",
+                "parent": "IC设计",
+                "knowledge_points": []
+            }
+        ],
+        "description": "PCB打板",
+        "progress": 50,
+        "progress_history": [
+            [
+                "2024-10-11 11:10:53",
+                "PCB稿子已经画好，等待下一步通知",
+                50
+            ]
+        ],
+        "interest": 2
+    },
+    {
+        "name": "字节跳动青训营",
+        "due_date": "2024-10-22",
+        "abilities": [
+            {
+                "name": "后端",
+                "parent": null,
+                "knowledge_points": []
+            }
+        ],
+        "description": "需要过考核，10道简单，4道中等，1道困难。打开火狐刷题。",
+        "progress": 0,
+        "progress_history": [],
+        "interest": 3
     }
 ]

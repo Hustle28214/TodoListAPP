@@ -18,6 +18,8 @@ class TasksView:
         self.frame = ttk.Frame(self.parent)
         self.frame.pack(fill='both', expand=True)
 
+        self.sorting_order = {}  # 记录每个列的排序顺序
+
         self.create_widgets()
 
     def create_widgets(self):
@@ -37,30 +39,38 @@ class TasksView:
         update_progress_button = tk.Button(buttons_frame, text="更新进度", command=self.update_progress)
         update_progress_button.pack(side=tk.LEFT, padx=5)
 
-        view_button = tk.Button(buttons_frame, text="查看详情", command=self.view_task)
-        view_button.pack(side=tk.LEFT, padx=5)
+        # view_button = tk.Button(buttons_frame, text="查看详情", command=self.view_task)
+        # view_button.pack(side=tk.LEFT, padx=5)
 
-        manage_abilities_button = tk.Button(buttons_frame, text="管理能力标签", command=self.manage_abilities)
-        manage_abilities_button.pack(side=tk.LEFT, padx=5)
+        # manage_abilities_button = tk.Button(buttons_frame, text="管理能力标签", command=self.manage_abilities)
+        # manage_abilities_button.pack(side=tk.LEFT, padx=5)
 
         # Treeview（任务列表）
         columns = ("Name", "Due Date", "Interest", "Ability", "Description", "Progress", "Type")
         self.tree = ttk.Treeview(self.frame, columns=columns, show='headings', selectmode='browse')
 
         for col in columns:
-            self.tree.heading(col, text=col)
+            if col in ["Interest", "Progress", "Due Date"]:
+                self.tree.heading(col, text=col, command=lambda _col=col: self.sort_treeview(_col))
+            else:
+                self.tree.heading(col, text=col)
             if col == "Description":
                 self.tree.column(col, width=200)
             elif col == "Progress":
                 self.tree.column(col, width=100)
             elif col == "Type":
                 self.tree.column(col, width=80)
+            elif col == "Due Date":
+                self.tree.column(col, width=120)
             else:
                 self.tree.column(col, width=100)
 
         self.tree.pack(fill='both', expand=True, padx=10, pady=10)
 
         self.refresh_treeview()
+
+        # 绑定双击事件以查看详情
+        self.tree.bind("<Double-1>", self.on_double_click)
 
     def refresh_treeview(self):
         for item in self.tree.get_children():
@@ -93,6 +103,47 @@ class TasksView:
                 "项目"
             ))
 
+    def sort_treeview(self, col):
+        # Determine sort order
+        if col in self.sorting_order and self.sorting_order[col] == "asc":
+            reverse = True
+            self.sorting_order[col] = "desc"
+        else:
+            reverse = False
+            self.sorting_order[col] = "asc"
+
+        # Fetch all items and sort them
+        data = []
+        for child in self.tree.get_children(''):
+            val = self.tree.set(child, col)
+            data.append((val, child))
+
+        if col == "Interest":
+            # Sort based on number of stars
+            data.sort(key=lambda t: t[0].count('★'), reverse=reverse)
+        elif col == "Progress":
+            # Sort numerically
+            try:
+                data.sort(key=lambda t: int(t[0].strip('%')), reverse=reverse)
+            except ValueError:
+                data.sort(key=lambda t: t[0], reverse=reverse)
+        elif col == "Due Date":
+            # Sort by date
+            try:
+                data.sort(key=lambda t: datetime.strptime(t[0], '%Y-%m-%d'), reverse=reverse)
+            except ValueError:
+                data.sort(key=lambda t: t[0], reverse=reverse)
+        else:
+            # For other columns, sort alphabetically
+            data.sort(key=lambda t: t[0].lower(), reverse=reverse)
+
+        # Rearrange items in sorted positions
+        for index, (val, child) in enumerate(data):
+            self.tree.move(child, '', index)
+
+    def on_double_click(self, event):
+        self.view_task()
+
     def open_add_task_window(self):
         add_window = tk.Toplevel(self.parent)
         add_window.title("添加新任务")
@@ -122,7 +173,7 @@ class TasksView:
         abilities_listbox = tk.Listbox(add_window, listvariable=abilities_var, selectmode='multiple', height=5)
         abilities_listbox.grid(row=3, column=1, padx=10, pady=5, sticky=tk.W)
 
-        add_ability_button = tk.Button(add_window, text="添加能力标签", command=lambda: self.add_ability_tag(add_window))
+        add_ability_button = tk.Button(add_window, text="添加能力标签", command=lambda: self.add_ability_tag(add_window, abilities_listbox))
         add_ability_button.grid(row=3, column=2, padx=5, pady=5)
 
         # 是否为项目
@@ -140,7 +191,10 @@ class TasksView:
         def add_task():
             name = name_entry.get().strip()
             due_date = cal.get_date()
-            interest = interest_var.get()
+            try:
+                interest = int(interest_var.get())
+            except ValueError:
+                interest = 0
 
             # 获取选择的多个能力标签
             selected_indices = abilities_listbox.curselection()
@@ -153,11 +207,18 @@ class TasksView:
                 messagebox.showwarning("警告", "任务名称不能为空！")
                 return
 
+            # 检查名称唯一性
             if is_project:
+                if any(p.name == name for p in self.projects):
+                    messagebox.showwarning("警告", "该项目名称已存在！")
+                    return
                 new_project = Project(name, due_date, selected_abilities, description, progress=0, interest=interest)
                 self.projects.append(new_project)
                 self.data_manager.save_projects(self.projects)
             else:
+                if any(t.name == name for t in self.tasks):
+                    messagebox.showwarning("警告", "该任务名称已存在！")
+                    return
                 new_task = Task(name, due_date, interest, description, abilities=selected_abilities, progress=0)
                 self.tasks.append(new_task)
                 self.data_manager.save_tasks(self.tasks)
@@ -171,7 +232,7 @@ class TasksView:
         add_button = tk.Button(add_window, text="添加", command=add_task)
         add_button.grid(row=6, column=0, columnspan=3, pady=10)
 
-    def add_ability_tag(self, parent_window):
+    def add_ability_tag(self, parent_window, abilities_listbox):
         new_tag = simpledialog.askstring("添加能力标签", "请输入新的能力标签:", parent=parent_window)
         if new_tag:
             if any(ability.name == new_tag for ability in self.abilities):
@@ -181,13 +242,8 @@ class TasksView:
                 self.abilities.append(new_ability)
                 self.data_manager.save_abilities(self.abilities)
                 display_info("成功", "能力标签已添加。")
-                # 更新列表框中的能力标签
-                children = parent_window.winfo_children()
-                for widget in children:
-                    if isinstance(widget, tk.Listbox):
-                        abilities_var = tk.Variable(value=[ability.name for ability in self.abilities])
-                        widget.config(listvariable=abilities_var)
-                        break
+                # 更新 Listbox 中的能力标签
+                abilities_listbox.insert(tk.END, new_tag)
 
     def edit_task(self):
         selected_item = self.tree.selection()
@@ -201,7 +257,7 @@ class TasksView:
                 task = next((t for t in self.tasks if t.name == task_name), None)
 
             if not task:
-                display_error("未找到选中的任务。")
+                display_error("错误", "未找到选中的任务。")
                 return
 
             edit_window = tk.Toplevel(self.parent)
@@ -240,7 +296,7 @@ class TasksView:
                 if ability.name in current_ability_names:
                     abilities_listbox.select_set(idx)
 
-            add_ability_button = tk.Button(edit_window, text="添加能力标签", command=lambda: self.add_ability_tag(edit_window))
+            add_ability_button = tk.Button(edit_window, text="添加能力标签", command=lambda: self.add_ability_tag(edit_window, abilities_listbox))
             add_ability_button.grid(row=3, column=2, padx=5, pady=5)
 
             # 类型（不可修改）
@@ -257,7 +313,10 @@ class TasksView:
             def save_changes():
                 name = name_entry.get().strip()
                 due_date = cal.get_date()
-                interest = interest_var.get()
+                try:
+                    interest = int(interest_var.get())
+                except ValueError:
+                    interest = 0
 
                 # 获取选择的多个能力标签
                 selected_indices = abilities_listbox.curselection()
@@ -269,14 +328,27 @@ class TasksView:
                     messagebox.showwarning("警告", "任务名称不能为空！")
                     return
 
+                # 检查任务名称是否重复（如果名称被更改）
+                if name != task.name:
+                    if task_type == "项目":
+                        if any(p.name == name for p in self.projects):
+                            messagebox.showwarning("警告", "该项目名称已存在！")
+                            return
+                    else:
+                        if any(t.name == name for t in self.tasks):
+                            messagebox.showwarning("警告", "该任务名称已存在！")
+                            return
+
                 task.name = name
                 task.due_date = due_date
                 task.interest = interest
                 task.abilities = selected_abilities
                 task.description = description
 
-                self.data_manager.save_tasks(self.tasks)
-                self.data_manager.save_projects(self.projects)
+                if task_type == "项目":
+                    self.data_manager.save_projects(self.projects)
+                else:
+                    self.data_manager.save_tasks(self.tasks)
 
                 # 同步每日进度
                 self.data_manager.synchronize_daily_progress()
@@ -302,7 +374,7 @@ class TasksView:
 
             task = next((t for t in task_list if t.name == task_name), None)
             if not task:
-                display_error("未找到选中的任务。")
+                display_error("错误", "未找到选中的任务。")
                 return
 
             confirm = messagebox.askyesno("确认", f"确定要删除选中的{task_type}吗？")
@@ -332,7 +404,7 @@ class TasksView:
                 task = next((t for t in self.tasks if t.name == task_name), None)
 
             if not task:
-                display_error("未找到选中的任务。")
+                display_error("错误", "未找到选中的任务。")
                 return
 
             if task_type == "项目":
@@ -380,7 +452,7 @@ class TasksView:
                 task = next((t for t in self.tasks if t.name == task_name), None)
 
             if not task:
-                display_error("未找到选中的任务。")
+                display_error("错误", "未找到选中的任务。")
                 return
 
             progress_window = tk.Toplevel(self.parent)
@@ -409,8 +481,10 @@ class TasksView:
                 task.progress = new_progress
                 task.progress_history.append((timestamp, description, new_progress))
 
-                self.data_manager.save_tasks(self.tasks)
-                self.data_manager.save_projects(self.projects)
+                if task_type == "项目":
+                    self.data_manager.save_projects(self.projects)
+                else:
+                    self.data_manager.save_tasks(self.tasks)
 
                 # 同步每日进度
                 self.data_manager.synchronize_daily_progress()
@@ -424,6 +498,5 @@ class TasksView:
             messagebox.showwarning("警告", "请选择要更新进度的任务！")
 
     def manage_abilities(self):
-        # 此处将调用abilities_view中的管理能力标签功能
-        # 需要确保AbilitiesView实例可访问
-        display_error("请通过主界面访问能力标签管理功能。")
+        # 修复错误：display_error 需要两个参数
+        display_error("错误", "请通过主界面访问能力标签管理功能。")

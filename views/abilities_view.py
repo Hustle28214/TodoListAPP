@@ -1,12 +1,14 @@
 # views/abilities_view.py
+
 import tkinter as tk
 from tkinter import messagebox, ttk, simpledialog
-from models import AbilityTag
+from models import AbilityTag, KnowledgePoint
 from utils import display_error, display_info
 from datetime import datetime, date
 import networkx as nx
 import matplotlib.pyplot as plt
-from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolbar2Tk
+import matplotlib.font_manager as fm
 
 class AbilitiesView:
     def __init__(self, parent, data_manager):
@@ -19,6 +21,7 @@ class AbilitiesView:
         self.parent = parent
         self.data_manager = data_manager
         self.abilities = self.data_manager.load_abilities()
+        self.projects = self.data_manager.load_projects()
 
         self.frame = ttk.Frame(self.parent)
         self.frame.pack(fill='both', expand=True)
@@ -63,6 +66,9 @@ class AbilitiesView:
 
         self.refresh_treeview()
 
+        # 绑定双击事件以查看知识点
+        self.tree.bind("<Double-1>", self.on_double_click)
+
     def search_abilities(self):
         search_term = self.search_var.get().strip()
         if not search_term:
@@ -94,6 +100,14 @@ class AbilitiesView:
                 return True
             return search_term.lower() in ability.name.lower()
 
+        # 定义一个函数，判断子孙节点是否有匹配搜索关键字的
+        def has_matching_descendant(ability):
+            children = [a for a in self.abilities if a.parent == ability.name]
+            for child in children:
+                if matches_search(child) or has_matching_descendant(child):
+                    return True
+            return False
+
         # 递归地添加子节点
         def add_children(parent_ability, parent_item):
             children = [ability for ability in self.abilities if ability.parent == parent_ability.name]
@@ -104,14 +118,6 @@ class AbilitiesView:
                     tree_items[child.name] = child_item
                     add_children(child, child_item)
 
-        # 定义一个函数，判断子孙节点是否有匹配搜索关键字的
-        def has_matching_descendant(ability):
-            children = [a for a in self.abilities if a.parent == ability.name]
-            for child in children:
-                if matches_search(child) or has_matching_descendant(child):
-                    return True
-            return False
-
         # 添加根节点及其子节点
         roots = [ability for ability in self.abilities if not ability.parent]
         for root in roots:
@@ -120,6 +126,126 @@ class AbilitiesView:
                 root_item = self.tree.insert('', 'end', text=root.name, values=(root.name,))
                 tree_items[root.name] = root_item
                 add_children(root, root_item)
+
+    def on_double_click(self, event):
+        selected_item = self.tree.selection()
+        if selected_item:
+            selected_name = self.tree.item(selected_item, 'text')
+            ability = next((a for a in self.abilities if a.name == selected_name), None)
+            if ability:
+                self.open_knowledge_points_window(ability)
+
+    def open_knowledge_points_window(self, ability):
+        """
+        打开一个窗口，显示并管理选定能力标签的知识点。
+        使用复选框来直接修改学习状态。
+        """
+        kp_window = tk.Toplevel(self.parent)
+        kp_window.title(f"{ability.name} 的知识点")
+        kp_window.grab_set()
+
+        # 知识点列表框
+        kp_frame = ttk.Frame(kp_window)
+        kp_frame.pack(fill='both', expand=True, padx=10, pady=10)
+
+        # 使用 Canvas 和 Scrollbar 来支持大量知识点
+        canvas = tk.Canvas(kp_frame)
+        scrollbar = ttk.Scrollbar(kp_frame, orient="vertical", command=canvas.yview)
+        scrollable_frame = ttk.Frame(canvas)
+
+        scrollable_frame.bind(
+            "<Configure>",
+            lambda e: canvas.configure(
+                scrollregion=canvas.bbox("all")
+            )
+        )
+
+        canvas.create_window((0, 0), window=scrollable_frame, anchor='nw')
+        canvas.configure(yscrollcommand=scrollbar.set)
+
+        canvas.pack(side="left", fill="both", expand=True)
+        scrollbar.pack(side="right", fill="y")
+
+        # 创建复选框列表
+        self.kp_vars = []
+        for idx, kp in enumerate(ability.knowledge_points):
+            var = tk.BooleanVar(value=kp.learned)
+            cb = tk.Checkbutton(scrollable_frame, text=kp.content, variable=var,
+                                command=lambda idx=idx, var=var: self.update_kp_status(ability, idx, var))
+            cb.pack(anchor='w', pady=2)
+            self.kp_vars.append(var)
+
+        # 按钮框架
+        buttons_frame = tk.Frame(kp_window)
+        buttons_frame.pack(pady=10)
+
+        add_kp_button = tk.Button(buttons_frame, text="添加知识点", command=lambda: self.add_knowledge_point(ability, scrollable_frame))
+        add_kp_button.pack(side=tk.LEFT, padx=5)
+
+        delete_kp_button = tk.Button(buttons_frame, text="删除知识点", command=lambda: self.delete_knowledge_point(ability, scrollable_frame))
+        delete_kp_button.pack(side=tk.LEFT, padx=5)
+
+        # 显示相关项目
+        projects_label = tk.Label(kp_window, text="相关项目:")
+        projects_label.pack(anchor=tk.W, padx=10, pady=(10, 0))
+
+        projects_list = tk.Listbox(kp_window, width=50)
+        projects_list.pack(fill=tk.BOTH, expand=True, padx=10, pady=5)
+        related_projects = [p.name for p in self.projects if any(a.name == ability.name for a in p.abilities)]
+        for project in related_projects:
+            projects_list.insert(tk.END, project)
+
+        # 关闭按钮
+        close_button = tk.Button(kp_window, text="关闭", command=kp_window.destroy)
+        close_button.pack(pady=10)
+
+    def update_kp_status(self, ability, idx, var):
+        """
+        更新知识点的学习状态。
+        """
+        ability.knowledge_points[idx].learned = var.get()
+        self.data_manager.save_abilities(self.abilities)
+
+    def add_knowledge_point(self, ability, parent_frame):
+        """
+        添加新的知识点到能力标签。
+        """
+        content = simpledialog.askstring("添加知识点", "请输入知识点内容：", parent=self.parent)
+        if content:
+            new_kp = KnowledgePoint(content=content)
+            ability.knowledge_points.append(new_kp)
+            self.data_manager.save_abilities(self.abilities)
+            # 添加新的复选框
+            var = tk.BooleanVar(value=new_kp.learned)
+            cb = tk.Checkbutton(parent_frame, text=new_kp.content, variable=var,
+                                command=lambda idx=len(ability.knowledge_points)-1, var=var: self.update_kp_status(ability, idx, var))
+            cb.pack(anchor='w', pady=2)
+            self.kp_vars.append(var)
+            display_info("成功", "知识点已添加。")
+
+    def delete_knowledge_point(self, ability, parent_frame):
+        """
+        删除选定的知识点。
+        """
+        # 获取所有复选框的状态
+        selected_indices = [idx for idx, var in enumerate(self.kp_vars) if var.get()]
+        if not selected_indices:
+            messagebox.showwarning("警告", "请选择要删除的知识点！")
+            return
+
+        confirm = messagebox.askyesno("确认", f"确定要删除选中的{len(selected_indices)}个知识点吗？")
+        if confirm:
+            # 删除从后向前，避免索引错乱
+            for idx in sorted(selected_indices, reverse=True):
+                ability.knowledge_points.pop(idx)
+                self.kp_vars.pop(idx)
+                # 找到对应的复选框并销毁
+                for child in parent_frame.winfo_children():
+                    if isinstance(child, tk.Checkbutton) and child.cget("text") == ability.knowledge_points[idx].content:
+                        child.destroy()
+                        break
+            self.data_manager.save_abilities(self.abilities)
+            display_info("成功", "选定的知识点已删除。")
 
     def add_ability(self):
         """
@@ -176,7 +302,7 @@ class AbilitiesView:
             ability = next((a for a in self.abilities if a.name == selected_name), None)
 
             if not ability:
-                messagebox.showwarning("警告", "未找到选中的能力标签！")
+                display_error("错误", "未找到选中的能力标签！")
                 return
 
             edit_window = tk.Toplevel(self.parent)
@@ -223,7 +349,7 @@ class AbilitiesView:
                             break
                     return False
 
-                if has_cycle(new_parent, ability.name):
+                if new_parent and has_cycle(new_parent, ability.name):
                     messagebox.showwarning("警告", "不能将子能力设置为父能力！")
                     return
 
@@ -239,7 +365,7 @@ class AbilitiesView:
             save_button = tk.Button(edit_window, text="保存修改", command=save_changes)
             save_button.grid(row=2, column=0, columnspan=2, pady=10)
         else:
-            messagebox.showwarning("警告", "请选择要编辑的能力标签！")
+            display_error("错误", "请选择要编辑的能力标签！")
 
     def delete_ability(self):
         """
@@ -251,13 +377,13 @@ class AbilitiesView:
             ability = next((a for a in self.abilities if a.name == selected_name), None)
 
             if not ability:
-                messagebox.showwarning("警告", "未找到选中的能力标签！")
+                display_error("错误", "未找到选中的能力标签！")
                 return
 
             # 检查是否有其他标签以当前标签为父标签
             children = [a for a in self.abilities if a.parent == ability.name]
             if children:
-                messagebox.showwarning("警告", f"无法删除 '{ability.name}' 标签，因为它有子标签。")
+                display_error("错误", f"无法删除 '{ability.name}' 标签，因为它有子标签。")
                 return
 
             confirm = messagebox.askyesno("确认", f"确定要删除能力标签 '{ability.name}' 吗？")
@@ -267,20 +393,19 @@ class AbilitiesView:
                 self.refresh_treeview()
                 display_info("成功", "能力标签已删除。")
         else:
-            messagebox.showwarning("警告", "请选择要删除的能力标签！")
+            display_error("错误", "请选择要删除的能力标签！")
 
     def visualize_abilities(self):
         """
-        使用 networkx 和 matplotlib 绘制能力树
+        使用 networkx 和 matplotlib 绘制能力树，并绑定点击事件。
+        允许图形放大缩小，并通过点击节点显示相关项目和知识点。
         """
-        # 导入必要的库
-        import networkx as nx
-        import matplotlib.pyplot as plt
-        from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
-        import matplotlib.font_manager as fms
-
         # 设置中文字体
-        plt.rcParams['font.family'] = 'SimHei'  # 替换为您的中文字体名称
+        try:
+            font = fm.FontProperties(fname="SimHei.ttf")
+            plt.rcParams['font.family'] = font.get_name()
+        except:
+            plt.rcParams['font.family'] = 'sans-serif'
         plt.rcParams['axes.unicode_minus'] = False
 
         # 创建有向图
@@ -293,40 +418,104 @@ class AbilitiesView:
                 G.add_edge(ability.parent, ability.name)
 
         # 绘制图形
-        fig = plt.figure(figsize=(8, 6))
-        pos = nx.spring_layout(G)
+        fig, ax = plt.subplots(figsize=(8, 6))
+        pos = nx.spring_layout(G, seed=42)  # 固定布局
         nx.draw(
             G,
             pos,
             with_labels=True,
-            font_family='SimHei',  # 指定字体
+            font_family='SimHei',
             node_color='lightblue',
             edge_color='gray',
             node_size=2000,
             arrows=True,
-            arrowsize=20
+            arrowsize=20,
+            ax=ax
         )
 
         # 将绘制的图形嵌入到 Tkinter 窗口中
-        self.show_graph_image(fig)
+        graph_window = tk.Toplevel(self.parent)
+        graph_window.title("能力树图形展示")
+        graph_window.grab_set()
 
-
-    def show_graph_image(self, fig):
-        """
-        在 Tkinter 窗口中显示 matplotlib 图形
-        """
-        image_window = tk.Toplevel(self.parent)
-        image_window.title("能力树图形展示")
-        image_window.grab_set()
-
-        # 在 Tkinter 窗口中嵌入 matplotlib 图形
-        canvas = FigureCanvasTkAgg(fig, master=image_window)
+        canvas = FigureCanvasTkAgg(fig, master=graph_window)
         canvas.draw()
-        canvas.get_tk_widget().pack(fill=tk.BOTH, expand=1)
+        canvas.get_tk_widget().pack(fill=tk.BOTH, expand=True)
 
-        def on_close():
-            plt.close(fig)
-            image_window.destroy()
+        # 添加导航工具栏
+        toolbar = NavigationToolbar2Tk(canvas, graph_window)
+        toolbar.update()
+        canvas._tkcanvas.pack(fill=tk.BOTH, expand=True)
 
-        close_button = tk.Button(image_window, text="关闭", command=on_close)
+        # 保存节点位置用于事件处理
+        self.node_positions = pos
+        self.graph = G
+        self.fig = fig
+
+        # 绑定点击事件
+        def on_click(event):
+            # 获取点击坐标
+            if event.inaxes != ax:
+                return
+            x_click = event.xdata
+            y_click = event.ydata
+            # 找到最近的节点
+            closest_node = None
+            min_distance = float('inf')
+            for node, (x, y) in pos.items():
+                distance = (x - x_click)**2 + (y - y_click)**2
+                if distance < min_distance:
+                    min_distance = distance
+                    closest_node = node
+            # 设置一个阈值，避免误点击
+            if min_distance < 0.05:
+                self.show_ability_details(closest_node)
+
+        fig.canvas.mpl_connect("button_press_event", on_click)
+
+        # 关闭按钮
+        close_button = tk.Button(graph_window, text="关闭", command=lambda: self.close_graph_window(fig, graph_window))
+        close_button.pack(pady=10)
+
+    def close_graph_window(self, fig, window):
+        plt.close(fig)
+        window.destroy()
+
+    def show_ability_details(self, ability_name):
+        """
+        显示选定能力标签的相关项目和知识点。
+        """
+        ability = next((a for a in self.abilities if a.name == ability_name), None)
+        if not ability:
+            display_error("错误", f"未找到能力标签 '{ability_name}'")
+            return
+
+        details_window = tk.Toplevel(self.parent)
+        details_window.title(f"{ability_name} 的详细信息")
+        details_window.grab_set()
+
+        # 项目列表
+        projects = [p for p in self.projects if any(a.name == ability_name for a in p.abilities)]
+        projects_label = tk.Label(details_window, text="相关项目:")
+        projects_label.pack(anchor=tk.W, padx=10, pady=(10, 0))
+
+        projects_list = tk.Listbox(details_window, width=50)
+        projects_list.pack(fill=tk.BOTH, expand=True, padx=10, pady=5)
+        for project in projects:
+            projects_list.insert(tk.END, project.name)
+
+        # 知识点列表
+        kp_label = tk.Label(details_window, text="知识点:")
+        kp_label.pack(anchor=tk.W, padx=10, pady=(10, 0))
+
+        kp_list = ttk.Treeview(details_window, columns=('Learned'), show='headings')
+        kp_list.heading('Learned', text='已学习')
+        kp_list.column('Learned', width=100, anchor='center')
+        kp_list.pack(fill='both', expand=True, padx=10, pady=5)
+
+        for kp in ability.knowledge_points:
+            kp_list.insert('', 'end', values=(kp.content, '✔️' if kp.learned else '❌'))
+
+        # 关闭按钮
+        close_button = tk.Button(details_window, text="关闭", command=details_window.destroy)
         close_button.pack(pady=10)

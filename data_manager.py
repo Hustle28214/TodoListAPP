@@ -1,8 +1,9 @@
 # data_manager.py
+
 import json
 import os
 from models import Task, DiaryEntry, PeriodicSummary, Project, AbilityTag, DailyProgress
-from collections import defaultdict  # 导入 defaultdict
+from collections import defaultdict
 import tempfile
 import shutil
 
@@ -67,7 +68,10 @@ class DataManager:
         if os.path.exists(self.diary_file):
             try:
                 with open(self.diary_file, 'r', encoding='utf-8') as f:
-                    data = json.load(f)
+                    data = f.read().strip()
+                    if not data:
+                        return []
+                    data = json.loads(data)
                     return [DiaryEntry.from_dict(entry) for entry in data]
             except json.JSONDecodeError as e:
                 print(f"加载日记时出错: {e}")
@@ -114,7 +118,12 @@ class DataManager:
             try:
                 with open(self.projects_file, 'r', encoding='utf-8') as f:
                     data = json.load(f)
-                    return [Project.from_dict(project) for project in data]
+                    projects = [Project.from_dict(project) for project in data]
+                    # 关联能力标签
+                    ability_dict = {ability.name: ability for ability in self.load_abilities()}
+                    for project in projects:
+                        project.abilities = [ability_dict.get(a.name, AbilityTag(a.name)) for a in project.abilities]
+                    return projects
             except json.JSONDecodeError as e:
                 print(f"加载项目时出错: {e}")
                 return []
@@ -145,7 +154,6 @@ class DataManager:
             print(f"保存项目时出错: {e}")
         except Exception as e:
             print(f"保存项目时出错: {e}")
-
 
     # ----------------- 能力标签数据管理 ----------------- #
     def load_abilities(self):
@@ -194,7 +202,7 @@ class DataManager:
             if date_str in existing_dates:
                 # 更新已存在的条目
                 dp = next(dp for dp in daily_progress_list if dp.progress_date == date_str)
-                dp.tasks_completed = count
+                dp.tasks_completed += count  # 叠加已完成任务数
             else:
                 # 添加新的条目
                 new_dp = DailyProgress(progress_date=date_str, tasks_completed=count)
