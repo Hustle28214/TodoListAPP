@@ -67,8 +67,8 @@ class RecallView:
         change_batch_button = tk.Button(unlearned_buttons_frame, text="换一批", command=self.change_batch)
         change_batch_button.pack(pady=5)
         
-        add_ability_button_unlearned = tk.Button(unlearned_buttons_frame, text="添加能力标签", command=lambda: self.add_ability_tag(unlearned_frame))
-        add_ability_button_unlearned.pack(pady=5)
+        # add_ability_button_unlearned = tk.Button(unlearned_buttons_frame, text="添加能力标签", command=lambda: self.add_ability_tag(unlearned_frame))
+        # add_ability_button_unlearned.pack(pady=5)
         
         # 绑定双击事件以查看未学习知识点详情（可选）
         self.unlearned_listbox.bind("<Double-1>", self.on_double_click_unlearned)
