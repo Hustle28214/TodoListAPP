@@ -1,5 +1,3 @@
-# main.py
-
 import tkinter as tk
 from tkinter import ttk
 from data_manager import DataManager
@@ -12,8 +10,39 @@ from views.daily_progress_view import DailyProgressView
 from views.analysis_view import AnalysisView  # 导入 AnalysisView
 from views.goals_view import GoalsView  # 导入 GoalsView
 from models import AbilityTag
-
 from views.pomodoro_view import PomodoroView  # 导入 PomodoroView
+
+
+def configure_styles():
+    """配置全局样式"""
+    style = ttk.Style()
+
+    # 设置全局字体和背景，使用 Microsoft YaHei 以支持中英文显示
+    style.configure(".", font=("Microsoft YaHei", 11), background="#f7f7f7", foreground="black")
+
+    # 定义Notebook样式
+    style.configure("TNotebook", background="#f7f7f7")
+    style.configure("TNotebook.Tab", padding=[10, 5], font=("Microsoft YaHei", 12, "bold"))
+
+    # 定义Tab标签页的激活样式
+    style.map("TNotebook.Tab", background=[("selected", "#4caf50")])
+
+    # 定义按钮样式
+    style.configure("TButton", font=("Microsoft YaHei", 10), padding=6, background="#4caf50", foreground="white")
+    style.map("TButton", background=[("active", "#388e3c"), ("pressed", "#2e7d32")])
+
+    # 配置Label样式
+    style.configure("TLabel", font=("Microsoft YaHei", 11), background="#f7f7f7", padding=5)
+
+    # 配置Frame样式
+    style.configure("TFrame", background="#f7f7f7")
+
+    # 配置Entry样式
+    style.configure("TEntry", padding=4)
+
+    # 增加Entry点击效果
+    style.map("TEntry", foreground=[("focus", "#333333")])
+
 
 def main():
     # 初始化主窗口
@@ -33,9 +62,18 @@ def main():
     # 加载能力标签
     abilities = data_manager.load_abilities()
 
+    # 配置全局样式
+    configure_styles()
+
+    # 标题栏
+    header = tk.Frame(root, bg="#4caf50", height=50)
+    header.pack(fill="x")
+    header_label = tk.Label(header, text="上岸", font=("Microsoft YaHei", 16, "bold"), bg="#4caf50", fg="white")
+    header_label.pack(pady=10)
+
     # 创建Notebook（标签页）
     notebook = ttk.Notebook(root)
-    notebook.pack(fill='both', expand=True)
+    notebook.pack(fill='both', expand=True, padx=20, pady=10)
 
     # 创建“任务”标签页
     tasks_frame = ttk.Frame(notebook)
@@ -82,8 +120,15 @@ def main():
     notebook.add(pomodoro_frame, text="番茄钟")
     PomodoroView(pomodoro_frame)
 
+    # 页脚
+    footer = tk.Frame(root, bg="#4caf50", height=30)
+    footer.pack(fill="x", side="bottom")
+    footer_label = tk.Label(footer, text="© 2024 上岸应用", bg="#4caf50", fg="white", font=("Microsoft YaHei", 10))
+    footer_label.pack(pady=5)
+
     # 启动主循环
     root.mainloop()
+
 
 if __name__ == "__main__":
     main()

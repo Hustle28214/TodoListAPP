@@ -40,7 +40,7 @@ class AnalysisView:
         """
         创建分析界面组件。
         """
-        label = tk.Label(self.frame, text="数据分析", font=("Arial", 16))
+        label = tk.Label(self.frame, text="数据分析", font=("Microsoft YaHei", 16))
         label.pack(pady=10)
 
         # 分析按钮

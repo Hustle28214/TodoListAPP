@@ -417,21 +417,57 @@ class AbilitiesView:
             if ability.parent:
                 G.add_edge(ability.parent, ability.name)
 
+        # 计算节点度数，度数高的节点可以更大更醒目
+        degrees = dict(G.degree)
+        max_degree = max(degrees.values()) if degrees else 1
+        node_sizes = [3000 + 5000 * (degrees[node] / max_degree) for node in G.nodes]
+        
+        # 为节点添加颜色渐变，度数高的节点颜色更深
+        cmap = plt.cm.Blues
+        node_colors = [cmap(degrees[node] / max_degree) for node in G.nodes]
+
         # 绘制图形
-        fig, ax = plt.subplots(figsize=(8, 6))
+        fig, ax = plt.subplots(figsize=(10, 8))
         pos = nx.spring_layout(G, seed=42)  # 固定布局
-        nx.draw(
-            G,
-            pos,
-            with_labels=True,
-            font_family='SimHei',
-            node_color='lightblue',
-            edge_color='gray',
-            node_size=2000,
+        
+        # 绘制节点
+        nx.draw_networkx_nodes(
+            G, pos,
+            node_size=node_sizes,
+            node_color=node_colors,
+            cmap=cmap,
+            alpha=0.9,
+            ax=ax
+        )
+        
+        # 绘制边，设置透明度与粗细
+        nx.draw_networkx_edges(
+            G, pos,
+            width=2,
+            alpha=0.6,
+            edge_color="gray",
             arrows=True,
             arrowsize=20,
             ax=ax
         )
+
+        # 绘制节点标签
+        nx.draw_networkx_labels(
+            G, pos,
+            font_size=12,
+            font_color='black',
+            font_family='SimHei',  # 确保中文兼容
+            ax=ax
+        )
+
+        # 添加节点颜色图例
+        sm = plt.cm.ScalarMappable(cmap=cmap, norm=plt.Normalize(vmin=0, vmax=max_degree))
+        sm.set_array([])
+        plt.colorbar(sm, ax=ax, label="节点度数")
+
+        # 美化图形的边框与背景
+        ax.set_title("能力标签图谱", fontsize=16, fontweight='bold', color="#4caf50")
+        ax.set_axis_off()
 
         # 将绘制的图形嵌入到 Tkinter 窗口中
         graph_window = tk.Toplevel(self.parent)

@@ -16,7 +16,7 @@ class GoalsView:
         self.create_widgets()
 
     def create_widgets(self):
-        label = tk.Label(self.frame, text="目标设置", font=("Arial", 16))
+        label = tk.Label(self.frame, text="目标设置", font=("Microsoft YaHei", 16))
         label.pack(pady=10)
 
         # 目标输入框
