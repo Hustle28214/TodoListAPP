@@ -6,9 +6,13 @@ from models import AbilityTag, KnowledgePoint
 from utils import display_error, display_info
 from datetime import datetime, date
 import networkx as nx
+import dash
+from dash import dcc, html
+from dash.dependencies import Input, Output
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolbar2Tk
 import matplotlib.font_manager as fm
+import plotly.graph_objects as go
 
 class AbilitiesView:
     def __init__(self, parent, data_manager):
@@ -398,123 +402,89 @@ class AbilitiesView:
         else:
             display_error("错误", "请选择要删除的能力标签！")
 
-    def visualize_abilities(self):
-        """
-        使用 networkx 和 matplotlib 绘制能力树，并绑定点击事件。
-        允许图形放大缩小，并通过点击节点显示相关项目和知识点。
-        """
-        # 设置中文字体
-        try:
-            font = fm.FontProperties(fname="SimHei.ttf")
-            plt.rcParams['font.family'] = font.get_name()
-        except:
-            plt.rcParams['font.family'] = 'sans-serif'
-        plt.rcParams['axes.unicode_minus'] = False
 
-        # 创建有向图
+
+
+    def visualize_abilities(self):
+        # Create a directed graph
         G = nx.DiGraph()
 
-        # 添加节点和边
+        # Add nodes and edges
         for ability in self.abilities:
             G.add_node(ability.name)
             if ability.parent:
                 G.add_edge(ability.parent, ability.name)
 
-        # 计算节点度数，度数高的节点可以更大更醒目
-        degrees = dict(G.degree)
-        max_degree = max(degrees.values()) if degrees else 1
-        node_sizes = [3000 + 5000 * (degrees[node] / max_degree) for node in G.nodes]
-        
-        # 为节点添加颜色渐变，度数高的节点颜色更深
-        cmap = plt.cm.Blues
-        node_colors = [cmap(degrees[node] / max_degree) for node in G.nodes]
+        # Use Kamada-Kawai layout for node positions
+        pos = nx.kamada_kawai_layout(G)
 
-        # 绘制图形
-        fig, ax = plt.subplots(figsize=(10, 8))
-        pos = nx.spring_layout(G, seed=42)  # 固定布局
-        
-        # 绘制节点
-        nx.draw_networkx_nodes(
-            G, pos,
-            node_size=node_sizes,
-            node_color=node_colors,
-            cmap=cmap,
-            alpha=0.9,
-            ax=ax
-        )
-        
-        # 绘制边，设置透明度与粗细
-        nx.draw_networkx_edges(
-            G, pos,
-            width=2,
-            alpha=0.6,
-            edge_color="gray",
-            arrows=True,
-            arrowsize=20,
-            ax=ax
+        # Extract x and y coordinates
+        x_values = [pos[node][0] for node in G.nodes()]
+        y_values = [pos[node][1] for node in G.nodes()]
+
+        # Create edge traces
+        edge_x = []
+        edge_y = []
+        for edge in G.edges():
+            x0, y0 = pos[edge[0]]
+            x1, y1 = pos[edge[1]]
+            edge_x.extend([x0, x1, None])
+            edge_y.extend([y0, y1, None])
+
+        # Set node sizes and colors
+        degrees = dict(G.degree())
+        node_size = [15 + 30 * (degrees[node] / max(degrees.values())) for node in G.nodes()]
+        node_color = [degrees[node] for node in G.nodes()]
+
+        # Create edge trace
+        edge_trace = go.Scatter(
+            x=edge_x, y=edge_y,
+            line=dict(width=0.5, color='#888'),
+            hoverinfo='none',
+            mode='lines'
         )
 
-        # 绘制节点标签
-        nx.draw_networkx_labels(
-            G, pos,
-            font_size=12,
-            font_color='black',
-            font_family='SimHei',  # 确保中文兼容
-            ax=ax
+        # Create node trace with hover effect
+        node_trace = go.Scatter(
+            x=x_values, y=y_values,
+            mode='markers+text',
+            text=list(G.nodes()),
+            textposition='bottom center',
+            hoverinfo='text',
+            hovertemplate='Node: %{text}<extra></extra>',
+            marker=dict(
+                showscale=True,
+                colorscale='YlGnBu',
+                color=node_color,
+                size=node_size,
+                colorbar=dict(
+                    thickness=15,
+                    title='Node Degree',
+                    xanchor='left',
+                    titleside='right'
+                ),
+                line=dict(width=2)
+            )
         )
 
-        # 添加节点颜色图例
-        sm = plt.cm.ScalarMappable(cmap=cmap, norm=plt.Normalize(vmin=0, vmax=max_degree))
-        sm.set_array([])
-        plt.colorbar(sm, ax=ax, label="节点度数")
+        # Create layout
+        layout = go.Layout(
+            title='Ability Tag Network',
+            titlefont_size=16,
+            showlegend=False,
+            hovermode='closest',
+            margin=dict(b=20, l=5, r=5, t=40),
+            xaxis=dict(showgrid=False, zeroline=False, showticklabels=False),
+            yaxis=dict(showgrid=False, zeroline=False, showticklabels=False)
+        )
 
-        # 美化图形的边框与背景
-        ax.set_title("能力标签图谱", fontsize=16, fontweight='bold', color="#4caf50")
-        ax.set_axis_off()
+        # Create figure
+        fig = go.Figure(data=[edge_trace, node_trace], layout=layout)
 
-        # 将绘制的图形嵌入到 Tkinter 窗口中
-        graph_window = tk.Toplevel(self.parent)
-        graph_window.title("能力树图形展示")
-        graph_window.grab_set()
+        # Show figure
+        fig.show()
 
-        canvas = FigureCanvasTkAgg(fig, master=graph_window)
-        canvas.draw()
-        canvas.get_tk_widget().pack(fill=tk.BOTH, expand=True)
 
-        # 添加导航工具栏
-        toolbar = NavigationToolbar2Tk(canvas, graph_window)
-        toolbar.update()
-        canvas._tkcanvas.pack(fill=tk.BOTH, expand=True)
-
-        # 保存节点位置用于事件处理
-        self.node_positions = pos
-        self.graph = G
-        self.fig = fig
-
-        # 绑定点击事件
-        def on_click(event):
-            # 获取点击坐标
-            if event.inaxes != ax:
-                return
-            x_click = event.xdata
-            y_click = event.ydata
-            # 找到最近的节点
-            closest_node = None
-            min_distance = float('inf')
-            for node, (x, y) in pos.items():
-                distance = (x - x_click)**2 + (y - y_click)**2
-                if distance < min_distance:
-                    min_distance = distance
-                    closest_node = node
-            # 设置一个阈值，避免误点击
-            if min_distance < 0.05:
-                self.show_ability_details(closest_node)
-
-        fig.canvas.mpl_connect("button_press_event", on_click)
-
-        # 关闭按钮
-        close_button = tk.Button(graph_window, text="关闭", command=lambda: self.close_graph_window(fig, graph_window))
-        close_button.pack(pady=10)
 
     def close_graph_window(self, fig, window):
         plt.close(fig)

@@ -1,7 +1,13 @@
 [
     {
         "progress_date": "2024-10-11",
-        "tasks_completed": 214,
+        "tasks_completed": 282,
+        "notes": "",
+        "tags": []
+    },
+    {
+        "progress_date": "2024-10-12",
+        "tasks_completed": 17,
         "notes": "",
         "tags": []
     }

@@ -251,38 +251,7 @@
     {
         "name": "基础理论",
         "parent": "机器学习",
-        "knowledge_points": [
-            {
-                "content": "最优化理论",
-                "learned": false,
-                "last_recall": null,
-                "next_recall": null
-            },
-            {
-                "content": "正则化",
-                "learned": false,
-                "last_recall": null,
-                "next_recall": null
-            },
-            {
-                "content": "信息论",
-                "learned": true,
-                "last_recall": "2024-10-11",
-                "next_recall": "2024-10-12"
-            },
-            {
-                "content": "VC Dimension",
-                "learned": false,
-                "last_recall": null,
-                "next_recall": null
-            },
-            {
-                "content": "bias-variance tradeoff",
-                "learned": false,
-                "last_recall": null,
-                "next_recall": null
-            }
-        ]
+        "knowledge_points": []
     },
     {
         "name": "DBSCAN",

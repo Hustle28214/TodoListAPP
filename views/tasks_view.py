@@ -69,33 +69,39 @@ class TasksView:
     def refresh_treeview(self):
         for item in self.tree.get_children():
             self.tree.delete(item)
+        
+        # Only include tasks and projects with progress less than 100%
         for task in self.tasks:
-            interest = task.interest if task.interest else 0
-            stars = '★' * interest + '☆' * (5 - interest)
-            task_type = "任务"
-            abilities_str = ", ".join([ability.name for ability in task.abilities]) if task.abilities else "无"
-            self.tree.insert('', tk.END, values=(
-                task.name,
-                task.due_date,
-                stars,
-                abilities_str,
-                task.description,
-                f"{task.progress}%",
-                task_type
-            ))
+            if task.progress < 100:  # Filter condition
+                interest = task.interest if task.interest else 0
+                stars = '★' * interest + '☆' * (5 - interest)
+                task_type = "任务"
+                abilities_str = ", ".join([ability.name for ability in task.abilities]) if task.abilities else "无"
+                self.tree.insert('', tk.END, values=(
+                    task.name,
+                    task.due_date,
+                    stars,
+                    abilities_str,
+                    task.description,
+                    f"{task.progress}%",
+                    task_type
+                ))
+        
         for project in self.projects:
-            interest = project.interest if project.interest else 0
-            stars = '★' * interest + '☆' * (5 - interest)
-            abilities_str = ", ".join([ability.name for ability in project.abilities]) if project.abilities else "无"
-            self.tree.insert('', tk.END, values=(
-                project.name,
-                project.due_date,
-                stars,
-                abilities_str,
-                project.description,
-                f"{project.progress}%",
-                "项目"
-            ))
+            if project.progress < 100:  # Filter condition
+                interest = project.interest if project.interest else 0
+                stars = '★' * interest + '☆' * (5 - interest)
+                abilities_str = ", ".join([ability.name for ability in project.abilities]) if project.abilities else "无"
+                self.tree.insert('', tk.END, values=(
+                    project.name,
+                    project.due_date,
+                    stars,
+                    abilities_str,
+                    project.description,
+                    f"{project.progress}%",
+                    "项目"
+                ))
+
 
     def sort_treeview(self, col):
         # Determine sort order

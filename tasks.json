@@ -70,8 +70,14 @@
         "interest": 2,
         "description": "已完成，需要北化在线提交并撰写报告",
         "abilities": [],
-        "progress": 0,
-        "progress_history": []
+        "progress": 100,
+        "progress_history": [
+            [
+                "2024-10-12 14:09:05",
+                "已完成",
+                100
+            ]
+        ]
     },
     {
         "name": "华为ICT大赛-网络赛道",
@@ -106,6 +112,34 @@
                 "2024-10-11 17:28:36",
                 "等待校赛晋级通知",
                 31
+            ]
+        ]
+    },
+    {
+        "name": "机器人自主操作组会",
+        "due_date": "2024-10-18",
+        "interest": 5,
+        "description": "",
+        "abilities": [
+            {
+                "name": "Coppeliasim",
+                "parent": "ROS",
+                "knowledge_points": [
+                    {
+                        "content": "导出代码",
+                        "learned": false,
+                        "last_recall": null,
+                        "next_recall": null
+                    }
+                ]
+            }
+        ],
+        "progress": 24,
+        "progress_history": [
+            [
+                "2024-10-12 16:38:09",
+                "MA论文的阅读",
+                24
             ]
         ]
     }
