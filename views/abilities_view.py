@@ -468,8 +468,8 @@ class AbilitiesView:
             projects = ability_projects.get(node, ["无"])
             ability_obj = next(a for a in abilities if a.name == node)
             knowledge_points = [kp.content for kp in ability_obj.knowledge_points]
-            kp_text = "<br>".join(knowledge_points) if knowledge_points else "无"
-            projects_text = "<br>".join(projects) if projects else "无"
+            kp_text = " & ".join(knowledge_points) if knowledge_points else "无"
+            projects_text = " & ".join(projects) if projects else "无"
             hover_text.append(f'能力标签: {node}<br>相关项目: {projects_text}<br>知识点: {kp_text}')
 
         # 创建节点的 Plotly 轨迹
