@@ -497,7 +497,7 @@ class AbilitiesView:
 
         # 创建布局
         layout = go.Layout(
-            title='能力标签网络',
+            title='我的能力网',
             titlefont_size=16,
             showlegend=False,
             hovermode='closest',
@@ -559,8 +559,8 @@ class AbilitiesView:
         """
         app = self.create_dash_app(self.abilities, self.projects)
         
-        # 定义服务器地址
-        server_url = "http://127.0.0.1:8050/"
+        # 定义服务器地址 可以后期再改
+        server_url = "http://127.0.0.1:8050/" 
 
         # 启动 Dash 应用的函数
         def run_dash():
