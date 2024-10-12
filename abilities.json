@@ -383,5 +383,15 @@
         "name": "PLC",
         "parent": null,
         "knowledge_points": []
+    },
+    {
+        "name": "信息论",
+        "parent": "基础理论",
+        "knowledge_points": []
+    },
+    {
+        "name": "Naive Bayes",
+        "parent": "基础理论",
+        "knowledge_points": []
     }
 ]

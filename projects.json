@@ -5,7 +5,7 @@
         "abilities": [
             {
                 "name": "SolidWorks",
-                "parent": null,
+                "parent": "机械",
                 "knowledge_points": []
             }
         ],
@@ -72,8 +72,14 @@
             }
         ],
         "description": "本项目的软著写作，需要撰写项目文档，可能转手做。",
-        "progress": 0,
-        "progress_history": [],
+        "progress": 24,
+        "progress_history": [
+            [
+                "2024-10-12 20:25:53",
+                "git上传了说明书",
+                24
+            ]
+        ],
         "interest": 2
     },
     {
@@ -97,7 +103,7 @@
         "abilities": [
             {
                 "name": "SolidWorks",
-                "parent": null,
+                "parent": "机械",
                 "knowledge_points": []
             }
         ],
