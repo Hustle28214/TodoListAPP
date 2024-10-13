@@ -516,7 +516,7 @@ class AbilitiesView:
             dcc.Graph(
                 id='ability-graph',
                 figure=fig,
-                style={'height': '60vh'}  # 设置图形高度为视口高度的60%
+                style={'height': '90vh'}  # 设置图形高度为视口高度的60%
             ),
             html.Div(
                 id='node-details',
@@ -542,8 +542,8 @@ class AbilitiesView:
                 ability = next(a for a in abilities if a.name == node_name)
                 projects = ability_projects.get(node_name, ["无"])
                 knowledge_points = [kp.content for kp in ability.knowledge_points]
-                kp_text = "<br>".join(knowledge_points) if knowledge_points else "无"
-                projects_text = "<br>".join(projects) if projects else "无"
+                kp_text = " & ".join(knowledge_points) if knowledge_points else "无"
+                projects_text = " & ".join(projects) if projects else "无"
                 return html.Div([
                     html.H4(f"能力标签: {node_name}"),
                     html.P(f"相关项目: {projects_text}"),
