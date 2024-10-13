@@ -32,7 +32,26 @@
     {
         "name": "ROS",
         "parent": null,
-        "knowledge_points": []
+        "knowledge_points": [
+            {
+                "content": "计算图",
+                "learned": true,
+                "last_recall": null,
+                "next_recall": null
+            },
+            {
+                "content": "话题订阅",
+                "learned": false,
+                "last_recall": null,
+                "next_recall": null
+            },
+            {
+                "content": "话题发布",
+                "learned": false,
+                "last_recall": null,
+                "next_recall": null
+            }
+        ]
     },
     {
         "name": "Coppeliasim",
@@ -59,11 +78,6 @@
     {
         "name": "无人机",
         "parent": "ROS",
-        "knowledge_points": []
-    },
-    {
-        "name": "深度学习",
-        "parent": "机器学习",
         "knowledge_points": []
     },
     {
@@ -390,8 +404,128 @@
         "knowledge_points": []
     },
     {
-        "name": "Naive Bayes",
+        "name": "正则化",
         "parent": "基础理论",
+        "knowledge_points": []
+    },
+    {
+        "name": "bias-variance tradeoff",
+        "parent": "基础理论",
+        "knowledge_points": []
+    },
+    {
+        "name": "VC Dimension",
+        "parent": "基础理论",
+        "knowledge_points": []
+    },
+    {
+        "name": "最优化理论",
+        "parent": "基础理论",
+        "knowledge_points": []
+    },
+    {
+        "name": "层次聚类",
+        "parent": "无监督学习",
+        "knowledge_points": []
+    },
+    {
+        "name": "混合高斯模型",
+        "parent": "无监督学习",
+        "knowledge_points": []
+    },
+    {
+        "name": "PCA",
+        "parent": "无监督学习",
+        "knowledge_points": []
+    },
+    {
+        "name": "SVD & NMF",
+        "parent": "无监督学习",
+        "knowledge_points": []
+    },
+    {
+        "name": "word2vec",
+        "parent": "无监督学习",
+        "knowledge_points": []
+    },
+    {
+        "name": "LSI & PLSA & LDA",
+        "parent": "无监督学习",
+        "knowledge_points": []
+    },
+    {
+        "name": "k-means",
+        "parent": "无监督学习",
+        "knowledge_points": []
+    },
+    {
+        "name": "机器学习开发语言",
+        "parent": "机器学习",
+        "knowledge_points": []
+    },
+    {
+        "name": "R",
+        "parent": "开发语言",
+        "knowledge_points": []
+    },
+    {
+        "name": "Scala",
+        "parent": "开发语言",
+        "knowledge_points": []
+    },
+    {
+        "name": "大数据开发工具",
+        "parent": "机器学习",
+        "knowledge_points": []
+    },
+    {
+        "name": "Storm",
+        "parent": "大数据开发工具",
+        "knowledge_points": []
+    },
+    {
+        "name": "Hadoop",
+        "parent": "大数据开发工具",
+        "knowledge_points": []
+    },
+    {
+        "name": "Spark",
+        "parent": "大数据开发工具",
+        "knowledge_points": []
+    },
+    {
+        "name": "特征工程",
+        "parent": "机器学习",
+        "knowledge_points": []
+    },
+    {
+        "name": "特征选择方法",
+        "parent": "特征工程",
+        "knowledge_points": []
+    },
+    {
+        "name": "特征规范化",
+        "parent": "特征工程",
+        "knowledge_points": []
+    },
+    {
+        "name": "特征离散化",
+        "parent": "特征工程",
+        "knowledge_points": []
+    },
+    {
+        "name": "特征交叉&组合",
+        "parent": "特征工程",
+        "knowledge_points": []
+    },
+    {
+        "name": "后端开发语言",
+        "parent": "后端",
+        "knowledge_points": []
+    },
+    {
+        "name": "Taro",
+        "parent": "前端",
         "knowledge_points": []
     }
 ]

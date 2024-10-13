@@ -36,12 +36,17 @@
             }
         ],
         "description": "iGEM的最后一舞，仿照基因检测报告的APP。",
-        "progress": 78,
+        "progress": 100,
         "progress_history": [
             [
                 "2024-10-11 00:29:23",
                 "剩余Navigator和Android/iOS打包操作",
                 78
+            ],
+            [
+                "2024-10-13 21:35:35",
+                "全部完成",
+                100
             ]
         ],
         "interest": 2
@@ -63,7 +68,7 @@
     },
     {
         "name": "软著：项目管理系统",
-        "due_date": "2024-10-18",
+        "due_date": "2024-11-29",
         "abilities": [
             {
                 "name": "无",
@@ -72,12 +77,17 @@
             }
         ],
         "description": "本项目的软著写作，需要撰写项目文档，可能转手做。",
-        "progress": 24,
+        "progress": 38,
         "progress_history": [
             [
                 "2024-10-12 20:25:53",
                 "git上传了说明书",
                 24
+            ],
+            [
+                "2024-10-13 15:43:48",
+                "项目已经完成。操作步骤都已经上传",
+                38
             ]
         ],
         "interest": 2
@@ -93,8 +103,14 @@
             }
         ],
         "description": "需要学完赵虚左老师的ROS教程。",
-        "progress": 0,
-        "progress_history": [],
+        "progress": 35,
+        "progress_history": [
+            [
+                "2024-10-13 22:27:30",
+                "学完第二章",
+                35
+            ]
+        ],
         "interest": 3
     },
     {
@@ -108,8 +124,14 @@
             }
         ],
         "description": "初步调研完成，需要开始建模，磁环和内腔都有基本的思路",
-        "progress": 0,
-        "progress_history": [],
+        "progress": 9,
+        "progress_history": [
+            [
+                "2024-10-13 15:20:16",
+                "初步调研完成，需要建模",
+                9
+            ]
+        ],
         "interest": 4
     },
     {

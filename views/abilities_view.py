@@ -466,9 +466,12 @@ class AbilitiesView:
         hover_text = []
         for node in G.nodes():
             projects = ability_projects.get(node, ["无"])
-            ability_obj = next(a for a in abilities if a.name == node)
-            knowledge_points = [kp.content for kp in ability_obj.knowledge_points]
-            kp_text = " & ".join(knowledge_points) if knowledge_points else "无"
+            ability_obj = next((a for a in abilities if a.name == node), None)
+            if ability_obj:
+                knowledge_points = [kp.content for kp in ability_obj.knowledge_points]
+                kp_text = " & ".join(knowledge_points) if knowledge_points else "无"
+            else:
+                kp_text = "无"
             projects_text = " & ".join(projects) if projects else "无"
             hover_text.append(f'能力标签: {node}<br>相关项目: {projects_text}<br>知识点: {kp_text}')
 
@@ -516,7 +519,7 @@ class AbilitiesView:
             dcc.Graph(
                 id='ability-graph',
                 figure=fig,
-                style={'height': '90vh'}  # 设置图形高度为视口高度的60%
+                style={'height': '90vh'}  # 设置图形高度为视口高度的90%
             ),
             html.Div(
                 id='node-details',
